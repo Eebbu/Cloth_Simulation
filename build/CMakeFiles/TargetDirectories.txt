@@ -1,3 +1,0 @@
-/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/build/CMakeFiles/main.dir
-/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/build/CMakeFiles/edit_cache.dir
-/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/build/CMakeFiles/rebuild_cache.dir
