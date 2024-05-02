@@ -48,7 +48,7 @@ public:
         force += f;
 	}
 
-	void integrate(double timeStep) {
+	void step(double timeStep) {
 		if (!is_fixed) // Verlet integration
 		{
             acceleration = force/m;

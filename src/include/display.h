@@ -139,7 +139,7 @@ struct ClothRender {
         
         /** Model Matrix : Put cloth into the world **/
         glm::mat4 uniModelMatrix = glm::mat4(1.0f);
-        uniModelMatrix = glm::translate(uniModelMatrix, glm::vec3(cloth->clothPos.x, cloth->clothPos.y, cloth->clothPos.z));
+        uniModelMatrix = glm::translate(uniModelMatrix, glm::vec3(cloth->cloth_pos.x, cloth->cloth_pos.y, cloth->cloth_pos.z));
         glUniformMatrix4fv(glGetUniformLocation(programID, "uniModelMatrix"), 1, GL_FALSE, &uniModelMatrix[0][0]);
         
         /** Light **/
@@ -370,7 +370,7 @@ struct ClothSpringRender {
     ClothSpringRender(Cloth* c) {
         cloth = c;
         defaultColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
-        render.init(cloth->springs, defaultColor, glm::vec3(cloth->clothPos.x, cloth->clothPos.y, cloth->clothPos.z));
+        render.init(cloth->springs, defaultColor, glm::vec3(cloth->cloth_pos.x, cloth->cloth_pos.y, cloth->cloth_pos.z));
     }
     
     void flush() { render.flush(); }
