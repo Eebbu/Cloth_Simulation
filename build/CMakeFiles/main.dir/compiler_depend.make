@@ -1102,25 +1102,24 @@ CMakeFiles/main.dir/src/main.cpp.o: /Users/panzeng/Documents/ANU/semester_1/COMP
   /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/includes/glm/vec3.hpp \
   /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/includes/glm/vec4.hpp \
   /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/includes/glm/vector_relational.hpp \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Cloth.h \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Display.h \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Points.h \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Program.h \
   /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Rigid.h \
   /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Spring.h \
   /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Vectors.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/cloth.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/display.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/points.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/program.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/rigid.h \
   /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/stb_image.h
 
+
+/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/rigid.h:
+
+/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/points.h:
 
 /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Spring.h:
 
 /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Rigid.h:
-
-/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Points.h:
-
-/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Display.h:
-
-/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Cloth.h:
 
 /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/includes/glm/packing.hpp:
 
@@ -2002,6 +2001,8 @@ CMakeFiles/main.dir/src/main.cpp.o: /Users/panzeng/Documents/ANU/semester_1/COMP
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__functional/pointer_to_binary_function.h:
 
+/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/program.h:
+
 /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/includes/glm/gtc/epsilon.inl:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/exception:
@@ -2129,6 +2130,8 @@ CMakeFiles/main.dir/src/main.cpp.o: /Users/panzeng/Documents/ANU/semester_1/COMP
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__algorithm/fill.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__concepts/destructible.h:
+
+/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/display.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__concepts/derived_from.h:
 
@@ -2494,8 +2497,6 @@ CMakeFiles/main.dir/src/main.cpp.o: /Users/panzeng/Documents/ANU/semester_1/COMP
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__algorithm/ranges_copy.h:
 
-/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Program.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__algorithm/ranges_sort.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__type_traits/integral_constant.h:
@@ -2729,6 +2730,8 @@ CMakeFiles/main.dir/src/main.cpp.o: /Users/panzeng/Documents/ANU/semester_1/COMP
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__algorithm/is_sorted.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__algorithm/comp_ref_type.h:
+
+/Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/cloth.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/secure/_string.h:
 

@@ -988,12 +988,12 @@ CMakeFiles/main.dir/src/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/_types/_nl_item.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__bsd_locale_defaults.h \
   /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/stb_image.h \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Cloth.h \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Spring.h \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Points.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/cloth.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/spring.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/points.h \
   /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Vectors.h \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Rigid.h \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Program.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/rigid.h \
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/program.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/fstream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/filesystem \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1/__filesystem/copy_options.h \
@@ -1021,4 +1021,4 @@ CMakeFiles/main.dir/src/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/sys/_select.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/sys/_types/_uuid_t.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/gethostuuid.h \
-  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/Display.h
+  /Users/panzeng/Documents/ANU/semester_1/COMP8610/research/code/cloth-simulation/src/include/display.h
