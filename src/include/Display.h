@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-#include "Cloth.h"
-#include "Rigid.h"
-#include "Program.h"
+#include "cloth.h"
+#include "rigid.h"
+#include "program.h"
 #include "stb_image.h"
 
 struct Camera

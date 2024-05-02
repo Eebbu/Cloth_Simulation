@@ -10,10 +10,10 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "include/stb_image.h"
-#include "include/Cloth.h"
-#include "include/Rigid.h"
-#include "include/Program.h"
-#include "include/Display.h"
+#include "include/cloth.h"
+#include "include/rigid.h"
+#include "include/program.h"
+#include "include/display.h"
 
 #define WIDTH 800
 #define HEIGHT 800

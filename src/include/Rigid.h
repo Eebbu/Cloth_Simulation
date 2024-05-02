@@ -5,7 +5,7 @@
 #include <cmath>
 #include <vector>
 
-#include "Points.h"
+#include "points.h"
 
 struct Ground
 {

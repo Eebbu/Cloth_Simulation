@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "Spring.h"
-#include "Rigid.h"
+#include "spring.h"
+#include "rigid.h"
 
 class Cloth
 {
