@@ -19,7 +19,7 @@ public:
         DRAW_FACES
     };
 
-    DrawModeEnum drawMode = DRAW_FACES;
+    DrawModeEnum drawMode = DRAW_LINES;
     
     Vec3 clothPos;
     
