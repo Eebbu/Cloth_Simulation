@@ -90,9 +90,7 @@ public:
                 /** Add node to cloth **/
                 nodes.push_back(node);
                 
-                printf("\t[%d, %d] (%f, %f, %f) - (%f, %f)\n", i, j, node->position.x, node->position.y, node->position.z, node->texCoord.x, node->texCoord.y);
             }
-            std::cout << std::endl;
         }
         
         /** Add springs **/
