@@ -10,15 +10,13 @@
 
 #include <unistd.h> // To use getcwd()
 
-class Program
-{
+class Program {
 public:
     // ID of program
     unsigned int ID;
     
     // Read file and construct shader program
-    Program(const char *vsFilePath, const char *fsFilePath)
-    {
+    Program(const char *vsFilePath, const char *fsFilePath) {
         /** 1. Read file **/
         
         std::ifstream vsFile, fsFile;

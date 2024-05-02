@@ -2,22 +2,19 @@
 
 #include "Vectors.h"
 
-struct Vertex
-{
+struct Vertex {
 public:
     Vec3 position;
     Vec3 normal;
     
     Vertex() {}
-    Vertex(Vec3 pos)
-    {
+    Vertex(Vec3 pos) {
         position = pos;
     }
     ~Vertex() {}
 };
 
-class Mass
-{
+class Mass {
 public:
     double  m;           // In this project it will always be 1
     bool    isFixed;        // Use to pin the cloth
@@ -36,8 +33,7 @@ public:
         force.setZeroVec();
         acceleration.setZeroVec();
     }
-	Mass(Vec3 pos)
-    {
+	Mass(Vec3 pos) {
         m = 1.0;
         isFixed = false;
         position = pos;
@@ -45,15 +41,14 @@ public:
         force.setZeroVec();
         acceleration.setZeroVec();
     }
+
 	~Mass(void) {}
 
-	void addForce(Vec3 f)
-	{
+	void addForce(Vec3 f) {
         force += f;
 	}
 
-	void integrate(double timeStep) // Only non-fixed mass take integration
-	{
+	void integrate(double timeStep) {
 		if (!isFixed) // Verlet integration
 		{
             acceleration = force/m;
