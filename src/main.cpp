@@ -31,10 +31,7 @@ int windForceScale = 15;
 Vec3 windStartPos;
 Vec3 windDir;
 Vec3 wind;
-// Cloth
-Vec3 clothPos(-3, 7.5, -2);
-Vec2 clothSize(6, 6);
-Cloth cloth(clothPos, clothSize);
+Cloth cloth;
 
 // Ball
 Vec3 ballPos(0, 3, -2);
@@ -43,7 +40,7 @@ glm::vec4 ballColor(0.6f, 0.5f, 0.8f, 1.0f);
 Ball ball(ballPos, ballRadius, ballColor);
 // Window and world
 GLFWwindow *window;
-Vec3 bgColor = Vec3(50.0/255, 50.0/255, 60.0/255);
+Vec3 bgColor = Vec3(50.0/255, 50.0/255, 50.0/255);
 Vec3 gravity(0.0, -9.8 / cloth.iteration_freq, 0.0);
 
 int main(int argc, const char * argv[]) {
