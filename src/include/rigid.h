@@ -7,54 +7,6 @@
 
 #include "points.h"
 
-struct Ground
-{
-    Vec3 position;
-    int width, height;
-    glm::vec4 color;
-    const double friction = 0.9;
-    
-    std::vector<Vertex*> vertexes;
-    std::vector<Vertex*> faces;
-    
-    Ground(Vec3 pos, Vec2 size, glm::vec4 c) {
-        position = pos;
-        width = size.x;
-        height = size.y;
-        color = c;
-        
-        init();
-    }
-    ~Ground()
-    {
-        for (int i = 0; i < vertexes.size(); i++) { delete vertexes[i]; }
-        vertexes.clear();
-        faces.clear();
-    }
-    
-    void init()
-    {
-        vertexes.push_back(new Vertex(Vec3(0.0, 0.0, 0.0)));
-        vertexes.push_back(new Vertex(Vec3(width, 0.0, 0.0)));
-        vertexes.push_back(new Vertex(Vec3(0.0, 0.0, -height)));
-        vertexes.push_back(new Vertex(Vec3(width, 0.0, -height)));
-        
-        for (int i = 0; i < vertexes.size(); i ++) {
-            vertexes[i]->normal = Vec3(0.0, 1.0, 0.0); // It's not neccessery to normalize here
-            
-            // Debug info
-            printf("Ground[%d]: (%f, %f, %f) - (%f, %f, %f)\n", i, vertexes[i]->position.x, vertexes[i]->position.y, vertexes[i]->position.z, vertexes[i]->normal.x, vertexes[i]->normal.y, vertexes[i]->normal.z);
-        }
-        
-        faces.push_back(vertexes[0]);
-        faces.push_back(vertexes[1]);
-        faces.push_back(vertexes[2]);
-        faces.push_back(vertexes[1]);
-        faces.push_back(vertexes[2]);
-        faces.push_back(vertexes[3]);
-    }
-};
-
 class Sphere
 {
 public:

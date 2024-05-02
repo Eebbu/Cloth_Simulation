@@ -40,7 +40,7 @@ Light sun;
 struct ClothRender // Texture & Lighting
 {
     const Cloth* cloth;
-    int nodeCount; // Number of all nodes in faces
+    int massCount; // Number of all masses in faces
     
     glm::vec3 *vboPos; // Position
     glm::vec2 *vboTex; // Texture
@@ -57,19 +57,19 @@ struct ClothRender // Texture & Lighting
     
     ClothRender(Cloth* cloth)
     {
-        nodeCount = (int)(cloth->faces.size());
-        if (nodeCount <= 0) {
-            std::cout << "ERROR::ClothRender : No node exists." << std::endl;
+        massCount = (int)(cloth->faces.size());
+        if (massCount <= 0) {
+            std::cout << "ERROR::ClothRender : No mass exists." << std::endl;
             exit(-1);
         }
         
         this->cloth = cloth;
         
-        vboPos = new glm::vec3[nodeCount];
-        vboTex = new glm::vec2[nodeCount];
-        vboNor = new glm::vec3[nodeCount];
-        for (int i = 0; i < nodeCount; i ++) {
-            Node* n = cloth->faces[i];
+        vboPos = new glm::vec3[massCount];
+        vboTex = new glm::vec2[massCount];
+        vboNor = new glm::vec3[massCount];
+        for (int i = 0; i < massCount; i ++) {
+            Mass* n = cloth->faces[i];
             vboPos[i] = glm::vec3(n->position.x, n->position.y, n->position.z);
             vboTex[i] = glm::vec2(n->texCoord.x, n->texCoord.y); // Texture coord will only be set here
             vboNor[i] = glm::vec3(n->normal.x, n->normal.y, n->normal.z);
@@ -94,15 +94,15 @@ struct ClothRender // Texture & Lighting
         // Position buffer
         glBindBuffer(GL_ARRAY_BUFFER, vboIDs[0]);
         glVertexAttribPointer(aPtrPos, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-        glBufferData(GL_ARRAY_BUFFER, nodeCount*sizeof(glm::vec3), vboPos, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, massCount*sizeof(glm::vec3), vboPos, GL_DYNAMIC_DRAW);
         // Texture buffer
         glBindBuffer(GL_ARRAY_BUFFER, vboIDs[1]);
         glVertexAttribPointer(aPtrTex, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-        glBufferData(GL_ARRAY_BUFFER, nodeCount*sizeof(glm::vec2), vboTex, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, massCount*sizeof(glm::vec2), vboTex, GL_DYNAMIC_DRAW);
         // Normal buffer
         glBindBuffer(GL_ARRAY_BUFFER, vboIDs[2]);
         glVertexAttribPointer(aPtrNor, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-        glBufferData(GL_ARRAY_BUFFER, nodeCount*sizeof(glm::vec3), vboNor, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, massCount*sizeof(glm::vec3), vboNor, GL_DYNAMIC_DRAW);
         
         // Enable it's attribute pointers since they were set well
         glEnableVertexAttribArray(aPtrPos);
@@ -177,9 +177,9 @@ struct ClothRender // Texture & Lighting
     
     void flush()
     {
-        // Update all the positions of nodes
-        for (int i = 0; i < nodeCount; i ++) { // Tex coordinate dose not change
-            Node* n = cloth->faces[i];
+        // Update all the positions of masses
+        for (int i = 0; i < massCount; i ++) { // Tex coordinate dose not change
+            Mass* n = cloth->faces[i];
             vboPos[i] = glm::vec3(n->position.x, n->position.y, n->position.z);
             vboNor[i] = glm::vec3(n->normal.x, n->normal.y, n->normal.z);
         }
@@ -189,11 +189,11 @@ struct ClothRender // Texture & Lighting
         glBindVertexArray(vaoID);
         
         glBindBuffer(GL_ARRAY_BUFFER, vboIDs[0]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, nodeCount*sizeof(glm::vec3), vboPos);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, massCount*sizeof(glm::vec3), vboPos);
         glBindBuffer(GL_ARRAY_BUFFER, vboIDs[1]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, nodeCount* sizeof(glm::vec2), vboTex);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, massCount* sizeof(glm::vec2), vboTex);
         glBindBuffer(GL_ARRAY_BUFFER, vboIDs[2]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, nodeCount* sizeof(glm::vec3), vboNor);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, massCount* sizeof(glm::vec3), vboNor);
         
         /** Bind texture **/
         glActiveTexture(GL_TEXTURE0);
@@ -209,13 +209,13 @@ struct ClothRender // Texture & Lighting
         /** Draw **/
         switch (cloth->drawMode) {
             case Cloth::DRAW_NODES:
-                glDrawArrays(GL_POINTS, 0, nodeCount);
+                glDrawArrays(GL_POINTS, 0, massCount);
                 break;
             case Cloth::DRAW_LINES:
-                glDrawArrays(GL_LINES, 0, nodeCount);
+                glDrawArrays(GL_LINES, 0, massCount);
                 break;
             default:
-                glDrawArrays(GL_TRIANGLES, 0, nodeCount);
+                glDrawArrays(GL_TRIANGLES, 0, massCount);
                 break;
         }
         
@@ -230,7 +230,7 @@ struct ClothRender // Texture & Lighting
 struct SpringRender
 {
     std::vector<Spring*> springs;
-    int springCount; // Number of nodes in springs
+    int springCount; // Number of masses in springs
     
     glm::vec4 uniSpringColor;
     
@@ -250,7 +250,7 @@ struct SpringRender
         springs = s;
         springCount = (int)(springs.size());
         if (springCount <= 0) {
-            std::cout << "ERROR::SpringRender : No node exists." << std::endl;
+            std::cout << "ERROR::SpringRender : No mass exists." << std::endl;
             exit(-1);
         }
         
@@ -259,12 +259,12 @@ struct SpringRender
         vboPos = new glm::vec3[springCount*2];
         vboNor = new glm::vec3[springCount*2];
         for (int i = 0; i < springCount; i ++) {
-            Node* node1 = springs[i]->node1;
-            Node* node2 = springs[i]->node2;
-            vboPos[i*2] = glm::vec3(node1->position.x, node1->position.y, node1->position.z);
-            vboPos[i*2+1] = glm::vec3(node2->position.x, node2->position.y, node2->position.z);
-            vboNor[i*2] = glm::vec3(node1->normal.x, node1->normal.y, node1->normal.z);
-            vboNor[i*2+1] = glm::vec3(node2->normal.x, node2->normal.y, node2->normal.z);
+            Mass* mass1 = springs[i]->mass1;
+            Mass* mass2 = springs[i]->mass2;
+            vboPos[i*2] = glm::vec3(mass1->position.x, mass1->position.y, mass1->position.z);
+            vboPos[i*2+1] = glm::vec3(mass2->position.x, mass2->position.y, mass2->position.z);
+            vboNor[i*2] = glm::vec3(mass1->normal.x, mass1->normal.y, mass1->normal.z);
+            vboNor[i*2+1] = glm::vec3(mass2->normal.x, mass2->normal.y, mass2->normal.z);
         }
         
         /** Build render program **/
@@ -338,14 +338,14 @@ struct SpringRender
     
     void flush() // Rigid does not move, thus do not update vertexes' data
     {
-        // Update all the positions of nodes
+        // Update all the positions of masses
         for (int i = 0; i < springCount; i ++) {
-            Node* node1 = springs[i]->node1;
-            Node* node2 = springs[i]->node2;
-            vboPos[i*2] = glm::vec3(node1->position.x, node1->position.y, node1->position.z);
-            vboPos[i*2+1] = glm::vec3(node2->position.x, node2->position.y, node2->position.z);
-            vboNor[i*2] = glm::vec3(node1->normal.x, node1->normal.y, node1->normal.z);
-            vboNor[i*2+1] = glm::vec3(node2->normal.x, node2->normal.y, node2->normal.z);
+            Mass* mass1 = springs[i]->mass1;
+            Mass* mass2 = springs[i]->mass2;
+            vboPos[i*2] = glm::vec3(mass1->position.x, mass1->position.y, mass1->position.z);
+            vboPos[i*2+1] = glm::vec3(mass2->position.x, mass2->position.y, mass2->position.z);
+            vboNor[i*2] = glm::vec3(mass1->normal.x, mass1->normal.y, mass1->normal.z);
+            vboNor[i*2+1] = glm::vec3(mass2->normal.x, mass2->normal.y, mass2->normal.z);
         }
         
         glUseProgram(programID);
@@ -394,7 +394,7 @@ struct ClothSpringRender
 struct RigidRender // Single color & Lighting
 {
     std::vector<Vertex*> faces;
-    int vertexCount; // Number of nodes in faces
+    int vertexCount; // Number of masses in faces
     
     glm::vec4 uniRigidColor;
     
@@ -524,20 +524,6 @@ struct RigidRender // Single color & Lighting
         glBindVertexArray(0);
         glUseProgram(0);
     }
-};
-
-struct GroundRender
-{
-    Ground *ground;
-    RigidRender render;
-    
-    GroundRender(Ground* g)
-    {
-        ground = g;
-        render.init(ground->faces, ground->color, glm::vec3(ground->position.x, ground->position.y, ground->position.z));
-    }
-    
-    void flush() { render.flush(); }
 };
 
 struct BallRender

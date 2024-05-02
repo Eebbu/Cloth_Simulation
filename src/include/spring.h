@@ -7,18 +7,18 @@ using namespace std;
 class Spring
 {
 public:
-    Node *node1;
-    Node *node2;
+    Mass* mass1;
+    Mass* mass2;
 	double restLen;
     double hookCoef;
     double dampCoef;
     
-	Spring(Node *n1, Node *n2, double k)
+	Spring(Mass* m1, Mass* m2, double k)
 	{
-        node1 = n1;
-        node2 = n2;
+        mass1 = m1;
+        mass2 = m2;
 		
-        Vec3 currSp = node2->position - node1->position;
+        Vec3 currSp = mass2->position - mass1->position;
         restLen = currSp.length();
         hookCoef = k;
         dampCoef = 5.0;
@@ -26,11 +26,11 @@ public:
 
 	void applyInternalForce(double timeStep) // Compute spring internal force
 	{
-        double currLen = Vec3::dist(node1->position, node2->position);
-        Vec3 fDir1 = (node2->position - node1->position)/currLen;
-        Vec3 diffV1 = node2->velocity - node1->velocity;
+        double currLen = Vec3::dist(mass1->position, mass2->position);
+        Vec3 fDir1 = (mass2->position - mass1->position)/currLen;
+        Vec3 diffV1 = mass2->velocity - mass1->velocity;
         Vec3 f1 = fDir1 * ((currLen-restLen)*hookCoef + Vec3::dot(diffV1, fDir1)*dampCoef);
-        node1->addForce(f1);
-        node2->addForce(f1.minus());
+        mass1->addForce(f1);
+        mass2->addForce(f1.minus());
 	}
 };
