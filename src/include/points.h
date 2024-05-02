@@ -16,10 +16,10 @@ public:
     ~Vertex() {}
 };
 
-class Node
+class Mass
 {
 public:
-    double  mass;           // In this project it will always be 1
+    double  m;           // In this project it will always be 1
     bool    isFixed;        // Use to pin the cloth
     Vec2    texCoord;       // Texture coord
     Vec3    normal;         // For smoothly shading
@@ -29,34 +29,34 @@ public:
 	Vec3	acceleration;
 
 public:
-    Node(void) {
-        mass = 1.0;
+    Mass(void) {
+        m = 1.0;
         isFixed = false;
         velocity.setZeroVec();
         force.setZeroVec();
         acceleration.setZeroVec();
     }
-	Node(Vec3 pos)
+	Mass(Vec3 pos)
     {
-        mass = 1.0;
+        m = 1.0;
         isFixed = false;
         position = pos;
         velocity.setZeroVec();
         force.setZeroVec();
         acceleration.setZeroVec();
     }
-	~Node(void) {}
+	~Mass(void) {}
 
 	void addForce(Vec3 f)
 	{
         force += f;
 	}
 
-	void integrate(double timeStep) // Only non-fixed nodes take integration
+	void integrate(double timeStep) // Only non-fixed mass take integration
 	{
 		if (!isFixed) // Verlet integration
 		{
-            acceleration = force/mass;
+            acceleration = force/m;
             velocity += acceleration*timeStep;
             position += velocity*timeStep;
         }
