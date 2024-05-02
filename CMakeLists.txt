@@ -14,7 +14,8 @@ link_libraries(${PROJECT_SOURCE_DIR}/lib/libglfw.3.dylib)
 
 add_executable(${PROJECT_NAME} 
     src/glad.c
-    src/main.cpp)
+    src/main.cpp
+    src/stb_image.cpp)
 
 if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")

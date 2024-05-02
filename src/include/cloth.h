@@ -7,17 +7,18 @@
 
 class Cloth {
 public:
-    const int massesDensity = 4;
-    const int iterationFreq = 25;
-    const double structuralCoef = 1000.0;
-    const double shearCoef = 50.0;
-    const double bendingCoef = 400.0;
+    const int mass_density = 4;
+    const int iteration_freq = 25;
+    const double structuralCoef = 600.0;
+    const double shearCoef = 40.0;
+    const double bendingCoef = 300.0;
     
     enum DrawModeEnum {
         DRAW_NODES,
         DRAW_LINES,
         DRAW_FACES
     };
+
     DrawModeEnum drawMode = DRAW_FACES;
     
     Vec3 clothPos;
@@ -28,9 +29,6 @@ public:
     std::vector<Mass*> masses;
 	std::vector<Spring*> springs;
 	std::vector<Mass*> faces;
-    
-    Vec2 pin1;
-    Vec2 pin2;
     
 	Cloth(Vec3 pos, Vec2 size) {
         clothPos = pos;
@@ -52,46 +50,34 @@ public:
 	}
  
 public:
-    Mass* getMass(int x, int y) { 
+    Mass* get_mass(int x, int y) { 
         return masses[y * massesPerRow + x]; 
     }
 
     Vec3 computeFaceNormal(Mass* n1, Mass* n2, Mass* n3) {
         return Vec3::cross(n2->position - n1->position, n3->position - n1->position);
     }
-    
-    void pin(Vec2 index, Vec3 offset) {
-        if (!(index.x < 0 || index.x >= massesPerRow || index.y < 0 || index.y >= massesPerCol)) {
-            getMass(index.x, index.y)->position += offset;
-            getMass(index.x, index.y)->isFixed = true;
-        }
-    }
 
-    void unPin(Vec2 index) {
-        if (!(index.x < 0 || index.x >= massesPerRow || index.y < 0 || index.y >= massesPerCol)) {
-            getMass(index.x, index.y)->isFixed = false;
-        }
+    void fixed_mass(Mass* mass, Vec3 offset) {
+        mass->position += offset;
+        mass->is_fixed = true;
     }
     
 	void init() {
-        massesPerRow = width * massesDensity;
-        massesPerCol = height * massesDensity;
-        
-        pin1 = Vec2(0, 0);
-        pin2 = Vec2(massesPerRow-1, 0);
+        massesPerRow = width * mass_density;
+        massesPerCol = height * mass_density;
         
         /** Add masses **/
         printf("Init cloth with %d masses\n", massesPerRow*massesPerCol);
         for (int i = 0; i < massesPerRow; i ++) {
             for (int j = 0; j < massesPerCol; j ++) {
                 /** Create mass by position **/
-                Mass* mass = new Mass(Vec3((double)j/massesDensity, -((double)i/massesDensity), 0));
+                Mass* mass = new Mass(Vec3((double)j/mass_density, -((double)i/mass_density), 0), false);
                 /** Set texture coordinates **/
                 mass->texCoord.x = (double)j/(massesPerRow-1);
                 mass->texCoord.y = (double)i/(1-massesPerCol);
                 /** Add mass to cloth **/
                 masses.push_back(mass);
-                
             }
         }
         
@@ -99,33 +85,33 @@ public:
         for (int i = 0; i < massesPerRow; i ++) {
             for (int j = 0; j < massesPerCol; j ++) {
                 /** Structural **/
-                if (i < massesPerRow-1) springs.push_back(new Spring(getMass(i, j), getMass(i+1, j), structuralCoef));
-                if (j < massesPerCol-1) springs.push_back(new Spring(getMass(i, j), getMass(i, j+1), structuralCoef));
+                if (i < massesPerRow-1) springs.push_back(new Spring(get_mass(i, j), get_mass(i+1, j), structuralCoef));
+                if (j < massesPerCol-1) springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+1), structuralCoef));
                 /** Shear **/
                 if (i < massesPerRow-1 && j < massesPerCol-1) {
-                    springs.push_back(new Spring(getMass(i, j), getMass(i+1, j+1), shearCoef));
-                    springs.push_back(new Spring(getMass(i+1, j), getMass(i, j+1), shearCoef));
+                    springs.push_back(new Spring(get_mass(i, j), get_mass(i+1, j+1), shearCoef));
+                    springs.push_back(new Spring(get_mass(i+1, j), get_mass(i, j+1), shearCoef));
                 }
                 /** Bending **/
-                if (i < massesPerRow-2) springs.push_back(new Spring(getMass(i, j), getMass(i+2, j), bendingCoef));
-                if (j < massesPerCol-2) springs.push_back(new Spring(getMass(i, j), getMass(i, j+2), bendingCoef));
+                if (i < massesPerRow-2) springs.push_back(new Spring(get_mass(i, j), get_mass(i+2, j), bendingCoef));
+                if (j < massesPerCol-2) springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+2), bendingCoef));
             }
         }
-        
-        pin(pin1, Vec3(1.0, 0.0, 0.0));
-        pin(pin2, Vec3(-1.0, 0.0, 0.0));
-        
+
+        fixed_mass(get_mass(0, 0), Vec3(1.0, 0.0, 0.0));
+        fixed_mass(get_mass(massesPerRow-1, 0), Vec3(-1.0, 0.0, 0.0));
+
 		/** Triangle faces **/
         for (int i = 0; i < massesPerRow-1; i ++) {
             for (int j = 0; j < massesPerCol-1; j ++) {
                 // Left upper triangle
-                faces.push_back(getMass(i+1, j));
-                faces.push_back(getMass(i, j));
-                faces.push_back(getMass(i, j+1));
+                faces.push_back(get_mass(i+1, j));
+                faces.push_back(get_mass(i, j));
+                faces.push_back(get_mass(i, j+1));
                 // Right bottom triangle
-                faces.push_back(getMass(i+1, j+1));
-                faces.push_back(getMass(i+1, j));
-                faces.push_back(getMass(i, j+1));
+                faces.push_back(get_mass(i+1, j+1));
+                faces.push_back(get_mass(i+1, j));
+                faces.push_back(get_mass(i, j+1));
             }
         }
 	}
@@ -156,21 +142,18 @@ public:
 	}
 	
 	void addForce(Vec3 f) {		 
-		for (int i = 0; i < masses.size(); i++)
-		{
+		for (int i = 0; i < masses.size(); i++) {
 			masses[i]->addForce(f);
 		}
 	}
 
 	void computeForce(double timeStep, Vec3 gravity) {
         /** Masses **/
-		for (int i = 0; i < masses.size(); i++)
-		{
+		for (int i = 0; i < masses.size(); i++) {
 			masses[i]->addForce(gravity * masses[i]->m);
 		}
 		/** Springs **/
-		for (int i = 0; i < springs.size(); i++)
-		{
+		for (int i = 0; i < springs.size(); i++) {
 			springs[i]->applyInternalForce(timeStep);
 		}
 	}
