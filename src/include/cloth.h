@@ -25,10 +25,10 @@ public:
 
     DrawModeEnum drawMode = DRAW_FACES;
     
-    Vec3 clothPos = Vec3(-3, 7.5, -2);
-    std::vector<Mass*> masses;
+    Vec3 cloth_pos = Vec3(-3, 7.5, -2);
+    std::vector<Mass*>   masses;
 	std::vector<Spring*> springs;
-	std::vector<Mass*> faces;
+	std::vector<Mass*>   faces;
     
 	Cloth() {
         init();
@@ -108,27 +108,16 @@ public:
 	}
 	
 	void computeNormal() {
-        /** Reset masses' normal **/
-        Vec3 normal(0.0, 0.0, 0.0);
-        for (int i = 0; i < masses.size(); i ++) {
-            masses[i]->normal = normal;
-        }
-        /** Compute normal of each face **/
-        for (int i = 0; i < faces.size()/3; i ++) { // 3 masses in each face
-            Mass* n1 = faces[3*i+0];
-            Mass* n2 = faces[3*i+1];
-            Mass* n3 = faces[3*i+2];
+        for (int i = 0; i < faces.size()/3; i ++) { 
+            Mass* m1 = faces[3*i+0];
+            Mass* m2 = faces[3*i+1];
+            Mass* m3 = faces[3*i+2];
             
-            // Face normal
-            normal = Vec3::cross(n2->position - n1->position, n3->position - n1->position);
-            // Add all face normal
-            n1->normal += normal;
-            n2->normal += normal;
-            n3->normal += normal;
-        }
-        
-        for (int i = 0; i < masses.size(); i ++) {
-            masses[i]->normal.normalize();
+            Vec3 normal = Vec3::cross(m2->position - m1->position, m3->position - m1->position);
+            normal.normalize();
+            m1->normal = normal;
+            m2->normal = normal;
+            m3->normal = normal;
         }
 	}
 	
@@ -152,16 +141,16 @@ public:
 	void integrate(double airFriction, double timeStep) {
         /** Mass* */
         for (int i = 0; i < masses.size(); i++) {
-            masses[i]->integrate(timeStep);
+            masses[i]->step(timeStep);
         }
 	}
 	
     Vec3 getWorldPos(Mass* n) { 
-        return clothPos + n->position; 
+        return cloth_pos + n->position; 
     }
 
     void setWorldPos(Mass* n, Vec3 pos) { 
-        n->position = pos - clothPos; 
+        n->position = pos - cloth_pos; 
     }
     
 	void collisionResponse(Ball* ball) {
