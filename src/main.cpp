@@ -8,8 +8,6 @@
 #include <iostream>
 #include <cmath>
 
-#define STB_IMAGE_IMPLEMENTATION
-
 #include "include/stb_image.h"
 #include "include/cloth.h"
 #include "include/rigid.h"
@@ -52,7 +50,7 @@ Ball ball(ballPos, ballRadius, ballColor);
 // Window and world
 GLFWwindow *window;
 Vec3 bgColor = Vec3(50.0/255, 50.0/255, 60.0/255);
-Vec3 gravity(0.0, -9.8 / cloth.iterationFreq, 0.0);
+Vec3 gravity(0.0, -9.8 / cloth.iteration_freq, 0.0);
 
 int main(int argc, const char * argv[]) {
     /** Prepare for rendering **/
@@ -105,9 +103,6 @@ int main(int argc, const char * argv[]) {
     /** Redering loop **/
     running = 1;
     while (!glfwWindowShouldClose(window)) {
-        /** Check for events **/
-        processInput(window);
-        
         /** Set background clolor **/
         glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.0); // Set color value (R,G,B,A) - Set Status
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -115,7 +110,7 @@ int main(int argc, const char * argv[]) {
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
         
         if (running) {
-            for (int i = 0; i < cloth.iterationFreq; i ++) {
+            for (int i = 0; i < cloth.iteration_freq; i ++) {
                 cloth.computeForce(TIME_STEP, gravity);
                 cloth.integrate(AIR_FRICTION, TIME_STEP);
                 cloth.collisionResponse(&ball);
@@ -167,75 +162,5 @@ void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
         windDir.normalize();
         wind = windDir * windForceScale;
         cloth.addForce(wind);
-    }
-}
-
-void processInput(GLFWwindow *window) {
-    /** Keyboard control **/ // If key did not get pressed it will return GLFW_RELEASE
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
-    
-    /** Set draw mode **/
-    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
-        cloth.drawMode = Cloth::DRAW_NODES;
-    }
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
-        cloth.drawMode = Cloth::DRAW_LINES;
-    }
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
-        cloth.drawMode = Cloth::DRAW_FACES;
-    }
-    
-    /** Camera control : [W] [S] [A] [D] [Q] [E] **/
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        cam.pos.y += cam.speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        cam.pos.y -= cam.speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        cam.pos.x -= cam.speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        cam.pos.x += cam.speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        cam.pos.z -= cam.speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        cam.pos.z += cam.speed;
-    }
-    
-    /** Pause simulation **/
-    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-        running = 0;
-        printf("Paused.\n");
-    }
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        running = 1;
-        printf("Running..\n");
-    }
-    
-    /** Drop the cloth **/
-    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && running) {
-        cloth.unPin(cloth.pin1);
-    }
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && running) {
-        cloth.unPin(cloth.pin2);
-    }
-    
-    /** Pull cloth **/
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && running) {
-        cloth.addForce(Vec3(0.0, 0.0, -windForceScale));
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && running) {
-        cloth.addForce(Vec3(0.0, 0.0, windForceScale));
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && running) {
-        cloth.addForce(Vec3(-windForceScale, 0.0, 0.0));
-    }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && running) {
-        cloth.addForce(Vec3(windForceScale, 0.0, 0.0));
     }
 }
