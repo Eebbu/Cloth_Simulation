@@ -7,8 +7,7 @@
 
 #include "points.h"
 
-class Sphere
-{
+class Sphere {
 public:
     const int meridianNum = 24;
     const int parallelNum = 250;
@@ -18,21 +17,22 @@ public:
     std::vector<Vertex*> vertexes;
     std::vector<Vertex*> faces;
     
-    Sphere(int r)
-    {
+    Sphere(int r) {
         radius = r;
         init();
     }
-    ~Sphere()
-    {
+
+    ~Sphere() {
         for (int i = 0; i < vertexes.size(); i++) { delete vertexes[i]; }
         vertexes.clear();
         faces.clear();
     }
     
-    Vertex* getTop() { return vertexes[0]; }
-    Vertex* getVertex(int x, int y)
-    {
+    Vertex* getTop() { 
+        return vertexes[0]; 
+    }
+
+    Vertex* getVertex(int x, int y) {
         if (x < 0 || x >= parallelNum || y < 0 || y >= meridianNum) {
             printf("Vertex Index Out of Range.\n");
             exit(-1);
@@ -40,15 +40,16 @@ public:
             return vertexes[1+x*meridianNum+y];
         }
     }
-    Vertex* getBottom() { return vertexes[vertexes.size()-1]; }
+
+    Vertex* getBottom() { 
+        return vertexes[vertexes.size()-1]; 
+    }
     
-    Vec3 computeFaceNormal(Vertex* v1, Vertex* v2, Vertex* v3)
-    {
+    Vec3 computeFaceNormal(Vertex* v1, Vertex* v2, Vertex* v3) {
         return Vec3::cross(v2->position - v1->position, v3->position - v1->position);
     }
     
-    void computeSphereNormal()
-    {
+    void computeSphereNormal() {
         Vec3 normal(0.0, 0.0, 0.0);
         for (int i = 0; i < vertexes.size(); i ++) {
             vertexes[i]->normal = normal;
@@ -71,8 +72,7 @@ public:
         }
     }
     
-    void init() // Initialize vertexes coord and slice faces
-    {
+    void init() {
         /** Compute vertex position **/
         double cycleInterval = radius*2.0 / (parallelNum+1);
         double radianInterval = 2.0*M_PI/meridianNum;
@@ -126,8 +126,7 @@ public:
     }
 };
 
-struct Ball
-{
+struct Ball {
     Vec3 center;
     int radius;
     glm::vec4 color;
@@ -135,8 +134,7 @@ struct Ball
     
     Sphere* sphere;
     
-    Ball(Vec3 cen, int r, glm::vec4 c)
-    {
+    Ball(Vec3 cen, int r, glm::vec4 c) {
         center = cen;
         radius = r;
         color = c;

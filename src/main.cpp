@@ -9,6 +9,7 @@
 #include <cmath>
 
 #define STB_IMAGE_IMPLEMENTATION
+
 #include "include/stb_image.h"
 #include "include/cloth.h"
 #include "include/rigid.h"
@@ -17,7 +18,6 @@
 
 #define WIDTH 800
 #define HEIGHT 800
-
 #define AIR_FRICTION 0.02
 #define TIME_STEP 0.01
 
@@ -104,8 +104,7 @@ int main(int argc, const char * argv[]) {
     
     /** Redering loop **/
     running = 1;
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         /** Check for events **/
         processInput(window);
         
@@ -171,8 +170,7 @@ void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     }
 }
 
-void processInput(GLFWwindow *window)
-{
+void processInput(GLFWwindow *window) {
     /** Keyboard control **/ // If key did not get pressed it will return GLFW_RELEASE
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);

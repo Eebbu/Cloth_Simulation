@@ -5,8 +5,7 @@
 #include "spring.h"
 #include "rigid.h"
 
-class Cloth
-{
+class Cloth {
 public:
     const int massesDensity = 4;
     const int iterationFreq = 25;
@@ -14,7 +13,7 @@ public:
     const double shearCoef = 50.0;
     const double bendingCoef = 400.0;
     
-    enum DrawModeEnum{
+    enum DrawModeEnum {
         DRAW_NODES,
         DRAW_LINES,
         DRAW_FACES
@@ -33,45 +32,48 @@ public:
     Vec2 pin1;
     Vec2 pin2;
     
-	Cloth(Vec3 pos, Vec2 size)
-	{
+	Cloth(Vec3 pos, Vec2 size) {
         clothPos = pos;
         width = size.x;
         height = size.y;
         init();
 	}
-	~Cloth()
-	{ 
-		for (int i = 0; i < masses.size(); i++) { delete masses[i]; }
-		for (int i = 0; i < springs.size(); i++) { delete springs[i]; }
+	~Cloth() { 
+		for (int i = 0; i < masses.size(); i++) { 
+            delete masses[i]; 
+        }
+		for (int i = 0; i < springs.size(); i++) { 
+            delete springs[i]; 
+        }
+
 		masses.clear();
 		springs.clear();
 		faces.clear();
 	}
  
 public:
-    Mass* getMass(int x, int y) { return masses[y*massesPerRow+x]; }
-    Vec3 computeFaceNormal(Mass* n1, Mass* n2, Mass* n3)
-    {
+    Mass* getMass(int x, int y) { 
+        return masses[y * massesPerRow + x]; 
+    }
+
+    Vec3 computeFaceNormal(Mass* n1, Mass* n2, Mass* n3) {
         return Vec3::cross(n2->position - n1->position, n3->position - n1->position);
     }
     
-    void pin(Vec2 index, Vec3 offset) // Pin cloth's (x, y) mass with offset
-    {
+    void pin(Vec2 index, Vec3 offset) {
         if (!(index.x < 0 || index.x >= massesPerRow || index.y < 0 || index.y >= massesPerCol)) {
             getMass(index.x, index.y)->position += offset;
             getMass(index.x, index.y)->isFixed = true;
         }
     }
-    void unPin(Vec2 index) // Unpin cloth's (x, y) mass
-    {
+
+    void unPin(Vec2 index) {
         if (!(index.x < 0 || index.x >= massesPerRow || index.y < 0 || index.y >= massesPerCol)) {
             getMass(index.x, index.y)->isFixed = false;
         }
     }
     
-	void init()
-	{
+	void init() {
         massesPerRow = width * massesDensity;
         massesPerCol = height * massesDensity;
         
@@ -128,8 +130,7 @@ public:
         }
 	}
 	
-	void computeNormal()
-	{
+	void computeNormal() {
         /** Reset masses' normal **/
         Vec3 normal(0.0, 0.0, 0.0);
         for (int i = 0; i < masses.size(); i ++) {
@@ -154,16 +155,14 @@ public:
         }
 	}
 	
-	void addForce(Vec3 f)
-	{		 
+	void addForce(Vec3 f) {		 
 		for (int i = 0; i < masses.size(); i++)
 		{
 			masses[i]->addForce(f);
 		}
 	}
 
-	void computeForce(double timeStep, Vec3 gravity)
-	{
+	void computeForce(double timeStep, Vec3 gravity) {
         /** Masses **/
 		for (int i = 0; i < masses.size(); i++)
 		{
@@ -176,11 +175,9 @@ public:
 		}
 	}
 
-	void integrate(double airFriction, double timeStep)
-	{
+	void integrate(double airFriction, double timeStep) {
         /** Mass* */
-        for (int i = 0; i < masses.size(); i++)
-        {
+        for (int i = 0; i < masses.size(); i++) {
             masses[i]->integrate(timeStep);
         }
 	}

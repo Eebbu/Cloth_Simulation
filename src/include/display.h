@@ -7,8 +7,7 @@
 #include "program.h"
 #include "stb_image.h"
 
-struct Camera
-{
+struct Camera {
     const float speed = 0.05f;
     const float frustumRatio = 1.0f;
     
@@ -19,8 +18,7 @@ struct Camera
     glm::mat4 uniProjMatrix;
     glm::mat4 uniViewMatrix;
     
-    Camera()
-    {
+    Camera() {
         /** Projection matrix : The frustum that camera observes **/
         uniProjMatrix = glm::mat4(1.0f);
         uniProjMatrix = glm::perspective(glm::radians(45.0f), frustumRatio, 0.1f, 100.0f);
@@ -30,15 +28,13 @@ struct Camera
 };
 Camera cam;
 
-struct Light
-{
+struct Light {
     glm::vec3 pos = glm::vec3(-5.0f, 7.0f, 6.0f);
     glm::vec3 color = glm::vec3(0.7f, 0.7f, 1.0f);
 };
 Light sun;
 
-struct ClothRender // Texture & Lighting
-{
+struct ClothRender {
     const Cloth* cloth;
     int massCount; // Number of all masses in faces
     
@@ -55,8 +51,7 @@ struct ClothRender // Texture & Lighting
     GLint aPtrTex;
     GLint aPtrNor;
     
-    ClothRender(Cloth* cloth)
-    {
+    ClothRender(Cloth* cloth) {
         massCount = (int)(cloth->faces.size());
         if (massCount <= 0) {
             std::cout << "ERROR::ClothRender : No mass exists." << std::endl;
@@ -156,8 +151,7 @@ struct ClothRender // Texture & Lighting
         glBindVertexArray(0); // Unbined VAO
     }
     
-    void destroy()
-    {
+    void destroy() {
         delete [] vboPos;
         delete [] vboTex;
         delete [] vboNor;
@@ -175,8 +169,7 @@ struct ClothRender // Texture & Lighting
         }
     }
     
-    void flush()
-    {
+    void flush() {
         // Update all the positions of masses
         for (int i = 0; i < massCount; i ++) { // Tex coordinate dose not change
             Mass* n = cloth->faces[i];
@@ -227,8 +220,7 @@ struct ClothRender // Texture & Lighting
     }
 };
 
-struct SpringRender
-{
+struct SpringRender {
     std::vector<Spring*> springs;
     int springCount; // Number of masses in springs
     
@@ -245,8 +237,7 @@ struct SpringRender
     GLint aPtrNor;
     
     // Render any spring set, color and modelVector
-    void init(std::vector<Spring*> s, glm::vec4 c, glm::vec3 modelVec)
-    {
+    void init(std::vector<Spring*> s, glm::vec4 c, glm::vec3 modelVec) {
         springs = s;
         springCount = (int)(springs.size());
         if (springCount <= 0) {
@@ -318,26 +309,22 @@ struct SpringRender
         glBindVertexArray(0); // Unbined VAO
     }
     
-    void destroy()
-    {
+    void destroy() {
         delete [] vboPos;
         delete [] vboNor;
         
-        if (vaoID)
-        {
+        if (vaoID) {
             glDeleteVertexArrays(1, &vaoID);
             glDeleteBuffers(2, vboIDs);
             vaoID = 0;
         }
-        if (programID)
-        {
+        if (programID) {
             glDeleteProgram(programID);
             programID = 0;
         }
     }
     
-    void flush() // Rigid does not move, thus do not update vertexes' data
-    {
+    void flush() {
         // Update all the positions of masses
         for (int i = 0; i < springCount; i ++) {
             Mass* mass1 = springs[i]->mass1;
@@ -375,14 +362,12 @@ struct SpringRender
     }
 };
 
-struct ClothSpringRender
-{
+struct ClothSpringRender {
     Cloth *cloth;
     glm::vec4 defaultColor;
     SpringRender render;
     
-    ClothSpringRender(Cloth* c)
-    {
+    ClothSpringRender(Cloth* c) {
         cloth = c;
         defaultColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
         render.init(cloth->springs, defaultColor, glm::vec3(cloth->clothPos.x, cloth->clothPos.y, cloth->clothPos.z));
@@ -391,8 +376,7 @@ struct ClothSpringRender
     void flush() { render.flush(); }
 };
 
-struct RigidRender // Single color & Lighting
-{
+struct RigidRender {
     std::vector<Vertex*> faces;
     int vertexCount; // Number of masses in faces
     
@@ -409,8 +393,7 @@ struct RigidRender // Single color & Lighting
     GLint aPtrNor;
     
     // Render any rigid body only with it's faces, color and modelVector
-    void init(std::vector<Vertex*> f, glm::vec4 c, glm::vec3 modelVec)
-    {
+    void init(std::vector<Vertex*> f, glm::vec4 c, glm::vec3 modelVec) {
         faces = f;
         vertexCount = (int)(faces.size());
         if (vertexCount <= 0) {
@@ -479,26 +462,22 @@ struct RigidRender // Single color & Lighting
         glBindVertexArray(0); // Unbined VAO
     }
     
-    void destroy()
-    {
+    void destroy() {
         delete [] vboPos;
         delete [] vboNor;
         
-        if (vaoID)
-        {
+        if (vaoID) {
             glDeleteVertexArrays(1, &vaoID);
             glDeleteBuffers(2, vboIDs);
             vaoID = 0;
         }
-        if (programID)
-        {
+        if (programID) {
             glDeleteProgram(programID);
             programID = 0;
         }
     }
     
-    void flush() // Rigid does not move, thus do not update vertexes' data
-    {
+    void flush() {
         glUseProgram(programID);
         
         glBindVertexArray(vaoID);
@@ -526,13 +505,11 @@ struct RigidRender // Single color & Lighting
     }
 };
 
-struct BallRender
-{
+struct BallRender {
     Ball* ball;
     RigidRender render;
     
-    BallRender(Ball* b)
-    {
+    BallRender(Ball* b) {
         ball = b;
         render.init(ball->sphere->faces, ball->color, glm::vec3(ball->center.x, ball->center.y, ball->center.z));
     }

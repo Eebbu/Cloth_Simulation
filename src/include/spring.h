@@ -4,8 +4,7 @@
 
 using namespace std;
 
-class Spring
-{
+class Spring {
 public:
     Mass* mass1;
     Mass* mass2;
@@ -13,8 +12,7 @@ public:
     double hookCoef;
     double dampCoef;
     
-	Spring(Mass* m1, Mass* m2, double k)
-	{
+	Spring(Mass* m1, Mass* m2, double k) {
         mass1 = m1;
         mass2 = m2;
 		
@@ -24,8 +22,7 @@ public:
         dampCoef = 5.0;
 	}
 
-	void applyInternalForce(double timeStep) // Compute spring internal force
-	{
+	void applyInternalForce(double timeStep) {
         double currLen = Vec3::dist(mass1->position, mass2->position);
         Vec3 fDir1 = (mass2->position - mass1->position)/currLen;
         Vec3 diffV1 = mass2->velocity - mass1->velocity;
