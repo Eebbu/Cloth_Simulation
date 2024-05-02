@@ -19,12 +19,6 @@
 #define AIR_FRICTION 0.02
 #define TIME_STEP 0.01
 
-/** Executing Flow **/
-int running = 1;
-
-/** Functions **/
-void processInput(GLFWwindow *window);
-
 /** Callback functions **/
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
@@ -101,22 +95,18 @@ int main(int argc, const char * argv[]) {
     glPointSize(3);
     
     /** Redering loop **/
-    running = 1;
     while (!glfwWindowShouldClose(window)) {
         /** Set background clolor **/
         glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.0); // Set color value (R,G,B,A) - Set Status
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
-        
-        if (running) {
-            for (int i = 0; i < cloth.iteration_freq; i ++) {
-                cloth.computeForce(TIME_STEP, gravity);
-                cloth.integrate(AIR_FRICTION, TIME_STEP);
-                cloth.collisionResponse(&ball);
-            }
-            cloth.computeNormal();
+        for (int i = 0; i < cloth.iteration_freq; i ++) {
+            cloth.computeForce(TIME_STEP, gravity);
+            cloth.integrate(AIR_FRICTION, TIME_STEP);
+            cloth.collisionResponse(&ball);
         }
+        cloth.computeNormal();
         
         /** Display **/
         if (cloth.drawMode == Cloth::DRAW_LINES) {
@@ -142,14 +132,14 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && running) {
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         windBlowing = 1;
         // Set start point of wind direction
         windStartPos.setZeroVec();
         glfwGetCursorPos(window, &windStartPos.x, &windStartPos.y);
         windStartPos.y = -windStartPos.y; // Reverse y since the screen local in the fourth quadrant
     }
-    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE && running) {
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
         windBlowing = 0;
         windDir.setZeroVec();
     }
@@ -157,7 +147,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     /** Wind **/
-    if (windBlowing && running) {
+    if (windBlowing) {
         windDir = Vec3(xpos, -ypos, 0) - windStartPos;
         windDir.normalize();
         wind = windDir * windForceScale;
