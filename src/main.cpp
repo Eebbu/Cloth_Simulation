@@ -34,23 +34,16 @@ Vec3 wind;
 Cloth cloth;
 
 // Ball
-Vec3 ballPos(0, 3, -2);
-int ballRadius = 1;
-glm::vec4 ballColor(0.6f, 0.5f, 0.8f, 1.0f);
-Ball ball(ballPos, ballRadius, ballColor);
+Ball ball;
 // Window and world
 GLFWwindow *window;
-Vec3 bgColor = Vec3(50.0/255, 50.0/255, 50.0/255);
+Vec3 bgColor = Vec3(50.0/255, 50.0/255, 60.0/255);
 Vec3 gravity(0.0, -9.8 / cloth.iteration_freq, 0.0);
 
 int main(int argc, const char * argv[]) {
-    /** Prepare for rendering **/
-    // Initialize GLFW
     glfwInit();
-    // Set OpenGL version number as 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    // Use the core profile
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     // MacOS is forward compatible
 #ifdef __APPLE__

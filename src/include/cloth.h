@@ -59,14 +59,13 @@ public:
     
 	void init() {
         /** Add masses **/
-        printf("Init cloth with %d masses\n", mass_per_row*mass_per_col);
         for (int i = 0; i < mass_per_row; i ++) {
             for (int j = 0; j < mass_per_col; j ++) {
                 /** Create mass by position **/
                 Mass* mass = new Mass(Vec3((double)j/mass_density, -((double)i/mass_density), 0), false);
                 /** Set texture coordinates **/
-                mass->texCoord.x = (double)j/(mass_per_row-1);
-                mass->texCoord.y = (double)i/(1-mass_per_col);
+                mass->tex_coord.x = (double)j/(mass_per_row-1);
+                mass->tex_coord.y = (double)i/(1-mass_per_col);
                 /** Add mass to cloth **/
                 masses.push_back(mass);
             }
