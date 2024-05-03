@@ -66,7 +66,7 @@ struct ClothRender {
         for (int i = 0; i < massCount; i ++) {
             Mass* n = cloth->faces[i];
             vboPos[i] = glm::vec3(n->position.x, n->position.y, n->position.z);
-            vboTex[i] = glm::vec2(n->texCoord.x, n->texCoord.y); // Texture coord will only be set here
+            vboTex[i] = glm::vec2(n->tex_coord.x, n->tex_coord.y); // Texture coord will only be set here
             vboNor[i] = glm::vec3(n->normal.x, n->normal.y, n->normal.z);
         }
         
@@ -156,14 +156,13 @@ struct ClothRender {
         delete [] vboTex;
         delete [] vboNor;
         
-        if (vaoID)
-        {
+        if (vaoID) {
             glDeleteVertexArrays(1, &vaoID);
             glDeleteBuffers(3, vboIDs);
             vaoID = 0;
         }
-        if (programID)
-        {
+        
+        if (programID) {
             glDeleteProgram(programID);
             programID = 0;
         }

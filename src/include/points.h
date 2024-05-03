@@ -16,10 +16,10 @@ public:
 
 class Mass {
 public:
-    double  m;           // In this project it will always be 1
-    bool    is_fixed;        // Use to pin the cloth
-    Vec2    texCoord;       // Texture coord
-    Vec3    normal;         // For smoothly shading
+    double  m;           
+    bool    is_fixed;       
+    Vec2    tex_coord;       
+    Vec3    normal;         
 	Vec3	position;
     Vec3    velocity;
     Vec3    force;
@@ -48,12 +48,11 @@ public:
         force += f;
 	}
 
-	void step(double timeStep) {
-		if (!is_fixed) // Verlet integration
-		{
-            acceleration = force/m;
-            velocity += acceleration*timeStep;
-            position += velocity*timeStep;
+	void step(double time_step) {
+		if (!is_fixed) {
+            acceleration = force / m;
+            velocity += acceleration * time_step;
+            position += velocity * time_step;
         }
         force.setZeroVec();
 	}
