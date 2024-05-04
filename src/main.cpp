@@ -12,7 +12,7 @@
 #include "include/cloth.h"
 #include "include/rigid.h"
 #include "include/program.h"
-#include "include/display.h"
+#include "include/render.h"
 
 #define WIDTH 800
 #define HEIGHT 800
