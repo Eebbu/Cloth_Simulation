@@ -127,18 +127,14 @@ public:
 };
 
 struct Ball {
-    Vec3 center;
-    int radius;
-    glm::vec4 color;
-    const double friction = 0.8;
+    const Vec3       center = Vec3(0, 3, -2);
+    const int        radius = 1;
+    const glm::vec4  color = glm::vec4(0.6f, 0.5f, 0.8f, 1.0f);
+    const double     friction = 0.8;
     
     Sphere* sphere;
     
-    Ball(Vec3 cen, int r, glm::vec4 c) {
-        center = cen;
-        radius = r;
-        color = c;
-        
+    Ball() {
         sphere = new Sphere(radius);
     }
     ~Ball() {}

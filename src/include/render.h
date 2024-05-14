@@ -66,7 +66,7 @@ struct ClothRender {
         for (int i = 0; i < massCount; i ++) {
             Mass* n = cloth->faces[i];
             vboPos[i] = glm::vec3(n->position.x, n->position.y, n->position.z);
-            vboTex[i] = glm::vec2(n->texCoord.x, n->texCoord.y); // Texture coord will only be set here
+            vboTex[i] = glm::vec2(n->tex_coord.x, n->tex_coord.y); // Texture coord will only be set here
             vboNor[i] = glm::vec3(n->normal.x, n->normal.y, n->normal.z);
         }
         
@@ -139,7 +139,7 @@ struct ClothRender {
         
         /** Model Matrix : Put cloth into the world **/
         glm::mat4 uniModelMatrix = glm::mat4(1.0f);
-        uniModelMatrix = glm::translate(uniModelMatrix, glm::vec3(cloth->clothPos.x, cloth->clothPos.y, cloth->clothPos.z));
+        uniModelMatrix = glm::translate(uniModelMatrix, glm::vec3(cloth->cloth_pos.x, cloth->cloth_pos.y, cloth->cloth_pos.z));
         glUniformMatrix4fv(glGetUniformLocation(programID, "uniModelMatrix"), 1, GL_FALSE, &uniModelMatrix[0][0]);
         
         /** Light **/
@@ -156,14 +156,13 @@ struct ClothRender {
         delete [] vboTex;
         delete [] vboNor;
         
-        if (vaoID)
-        {
+        if (vaoID) {
             glDeleteVertexArrays(1, &vaoID);
             glDeleteBuffers(3, vboIDs);
             vaoID = 0;
         }
-        if (programID)
-        {
+        
+        if (programID) {
             glDeleteProgram(programID);
             programID = 0;
         }
@@ -370,7 +369,7 @@ struct ClothSpringRender {
     ClothSpringRender(Cloth* c) {
         cloth = c;
         defaultColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
-        render.init(cloth->springs, defaultColor, glm::vec3(cloth->clothPos.x, cloth->clothPos.y, cloth->clothPos.z));
+        render.init(cloth->springs, defaultColor, glm::vec3(cloth->cloth_pos.x, cloth->cloth_pos.y, cloth->cloth_pos.z));
     }
     
     void flush() { render.flush(); }
