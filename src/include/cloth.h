@@ -7,6 +7,13 @@
 
 class Cloth {
 public:
+<<<<<<< 156be3668b5f843f20a517eafaed334c01aa7efe
+    const int massesDensity = 4;
+    const int iterationFreq = 25;
+    const double structuralCoef = 1000.0;
+    const double shearCoef = 50.0;
+    const double bendingCoef = 200.0;
+=======
     const int     mass_density = 4;
     const int     iteration_freq = 25;
     const int     width = 6;
@@ -16,6 +23,7 @@ public:
     const double  structural_coef = 600.0;
     const double  shear_coef = 40.0;
     const double  bending_coef = 300.0;
+>>>>>>> 6fba961006f93192b952b7702c0c4773f9884958
     
     enum DrawModeEnum {
         DRAW_NODES,
@@ -87,10 +95,19 @@ public:
                 if (j < mass_per_col-2) springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+2), bending_coef));
             }
         }
+<<<<<<< 156be3668b5f843f20a517eafaed334c01aa7efe
+        pin1 = Vec2(0, 0);
+        pin2 = Vec2(massesPerRow-1, 0);
+        pin(pin1, Vec3(1.0, 0.0, 0.0));
+        pin(pin2, Vec3(-1.0, 0.0, 0.0));
+        pin(Vec2(massesPerRow-1,0),Vec3(-1.0, 0.0, 0.0));
+        pin(Vec2(0,1-massesPerCol),Vec3(0.0, 1.0, 0.0));
+=======
 
         fixed_mass(get_mass(0, 0), Vec3(1.0, 0.0, 0.0));
         fixed_mass(get_mass(mass_per_row-1, 0), Vec3(-1.0, 0.0, 0.0));
 
+>>>>>>> 6fba961006f93192b952b7702c0c4773f9884958
 		/** Triangle faces **/
         for (int i = 0; i < mass_per_row-1; i ++) {
             for (int j = 0; j < mass_per_col-1; j ++) {
