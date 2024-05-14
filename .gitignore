@@ -17,3 +17,4 @@ CMakeLists-zp.txt
 lib/libglad.a
 lib/libglfw3.a
 lib/glfw3dll.a
+CMakeLists.txt

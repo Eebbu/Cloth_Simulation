@@ -51,7 +51,9 @@ glm::vec4 ballColor(0.6f, 0.5f, 0.8f, 1.0f);
 Ball ball(ballPos, ballRadius, ballColor);
 // Window and world
 GLFWwindow *window;
-Vec3 bgColor = Vec3(50.0/255, 50.0/255, 60.0/255);
+// Vec3 bgColor = Vec3(50.0/255, 50.0/255, 60.0/255);
+Vec3 bgColor = Vec3(0.0/255, 0.0/255, 0.0/255);
+
 Vec3 gravity(0.0, -9.8 / cloth.iterationFreq, 0.0);
 
 int main(int argc, const char * argv[]) {
@@ -189,16 +191,16 @@ void processInput(GLFWwindow *window) {
     
     /** Camera control : [W] [S] [A] [D] [Q] [E] **/
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        cam.pos.y += cam.speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         cam.pos.y -= cam.speed;
     }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        cam.pos.y += cam.speed;
+    }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        cam.pos.x -= cam.speed;
+        cam.pos.x += cam.speed;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        cam.pos.x += cam.speed;
+        cam.pos.x -= cam.speed;
     }
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
         cam.pos.z -= cam.speed;

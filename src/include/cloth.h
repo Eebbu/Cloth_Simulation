@@ -11,7 +11,7 @@ public:
     const int iterationFreq = 25;
     const double structuralCoef = 1000.0;
     const double shearCoef = 50.0;
-    const double bendingCoef = 400.0;
+    const double bendingCoef = 200.0;
     
     enum DrawModeEnum {
         DRAW_NODES,
@@ -111,10 +111,12 @@ public:
                 if (j < massesPerCol-2) springs.push_back(new Spring(getMass(i, j), getMass(i, j+2), bendingCoef));
             }
         }
-        
+        pin1 = Vec2(0, 0);
+        pin2 = Vec2(massesPerRow-1, 0);
         pin(pin1, Vec3(1.0, 0.0, 0.0));
         pin(pin2, Vec3(-1.0, 0.0, 0.0));
-        
+        pin(Vec2(massesPerRow-1,0),Vec3(-1.0, 0.0, 0.0));
+        pin(Vec2(0,1-massesPerCol),Vec3(0.0, 1.0, 0.0));
 		/** Triangle faces **/
         for (int i = 0; i < massesPerRow-1; i ++) {
             for (int j = 0; j < massesPerCol-1; j ++) {
