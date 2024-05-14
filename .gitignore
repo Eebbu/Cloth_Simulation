@@ -11,10 +11,8 @@ include/KHR
 lib/libglfw.3.dylib
 lib/libglfw3.a
 src/glad.c
-CMakeLists-zp.txt
 
 #yzh
 lib/libglad.a
 lib/libglfw3.a
 lib/glfw3dll.a
-CMakeLists.txt
