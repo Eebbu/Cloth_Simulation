@@ -37,8 +37,9 @@ Cloth cloth;
 Ball ball;
 // Window and world
 GLFWwindow *window;
-Vec3 bgColor = Vec3(50.0/255, 50.0/255, 60.0/255);
+Vec3 bgColor = Vec3(0.0/255, 0.0/255, 0.0/255);
 Vec3 gravity(0.0, -9.8 / cloth.iteration_freq, 0.0);
+
 
 int main(int argc, const char * argv[]) {
     glfwInit();
