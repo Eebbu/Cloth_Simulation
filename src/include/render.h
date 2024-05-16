@@ -64,10 +64,10 @@ struct ClothRender {
         vboTex = new glm::vec2[massCount];
         vboNor = new glm::vec3[massCount];
         for (int i = 0; i < massCount; i ++) {
-            Mass* n = cloth->faces[i];
-            vboPos[i] = glm::vec3(n->position.x, n->position.y, n->position.z);
-            vboTex[i] = glm::vec2(n->tex_coord.x, n->tex_coord.y); // Texture coord will only be set here
-            vboNor[i] = glm::vec3(n->normal.x, n->normal.y, n->normal.z);
+            Mass* m = cloth->faces[i];
+            vboPos[i] = glm::vec3(m->position);
+            vboTex[i] = glm::vec2(m->tex_coord); // Texture coord will only be set here
+            vboNor[i] = glm::vec3(m->normal);
         }
         
         /** Build render program **/
@@ -139,7 +139,7 @@ struct ClothRender {
         
         /** Model Matrix : Put cloth into the world **/
         glm::mat4 uniModelMatrix = glm::mat4(1.0f);
-        uniModelMatrix = glm::translate(uniModelMatrix, glm::vec3(cloth->cloth_pos.x, cloth->cloth_pos.y, cloth->cloth_pos.z));
+        uniModelMatrix = glm::translate(uniModelMatrix, cloth->cloth_pos);
         glUniformMatrix4fv(glGetUniformLocation(programID, "uniModelMatrix"), 1, GL_FALSE, &uniModelMatrix[0][0]);
         
         /** Light **/
@@ -171,9 +171,9 @@ struct ClothRender {
     void flush() {
         // Update all the positions of masses
         for (int i = 0; i < massCount; i ++) { // Tex coordinate dose not change
-            Mass* n = cloth->faces[i];
-            vboPos[i] = glm::vec3(n->position.x, n->position.y, n->position.z);
-            vboNor[i] = glm::vec3(n->normal.x, n->normal.y, n->normal.z);
+            Mass* m = cloth->faces[i];
+            vboPos[i] = glm::vec3(m->position);
+            vboNor[i] = glm::vec3(m->normal);
         }
         
         glUseProgram(programID);
@@ -251,10 +251,10 @@ struct SpringRender {
         for (int i = 0; i < springCount; i ++) {
             Mass* mass1 = springs[i]->mass1;
             Mass* mass2 = springs[i]->mass2;
-            vboPos[i*2] = glm::vec3(mass1->position.x, mass1->position.y, mass1->position.z);
-            vboPos[i*2+1] = glm::vec3(mass2->position.x, mass2->position.y, mass2->position.z);
-            vboNor[i*2] = glm::vec3(mass1->normal.x, mass1->normal.y, mass1->normal.z);
-            vboNor[i*2+1] = glm::vec3(mass2->normal.x, mass2->normal.y, mass2->normal.z);
+            vboPos[i*2] = glm::vec3(mass1->position);
+            vboPos[i*2+1] = glm::vec3(mass2->position);
+            vboNor[i*2] = glm::vec3(mass1->normal);
+            vboNor[i*2+1] = glm::vec3(mass2->normal);
         }
         
         /** Build render program **/
@@ -328,10 +328,10 @@ struct SpringRender {
         for (int i = 0; i < springCount; i ++) {
             Mass* mass1 = springs[i]->mass1;
             Mass* mass2 = springs[i]->mass2;
-            vboPos[i*2] = glm::vec3(mass1->position.x, mass1->position.y, mass1->position.z);
-            vboPos[i*2+1] = glm::vec3(mass2->position.x, mass2->position.y, mass2->position.z);
-            vboNor[i*2] = glm::vec3(mass1->normal.x, mass1->normal.y, mass1->normal.z);
-            vboNor[i*2+1] = glm::vec3(mass2->normal.x, mass2->normal.y, mass2->normal.z);
+            vboPos[i*2] = glm::vec3(mass1->position);
+            vboPos[i*2+1] = glm::vec3(mass2->position);
+            vboNor[i*2] = glm::vec3(mass1->normal);
+            vboNor[i*2+1] = glm::vec3(mass2->normal);
         }
         
         glUseProgram(programID);
@@ -369,7 +369,7 @@ struct ClothSpringRender {
     ClothSpringRender(Cloth* c) {
         cloth = c;
         defaultColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
-        render.init(cloth->springs, defaultColor, glm::vec3(cloth->cloth_pos.x, cloth->cloth_pos.y, cloth->cloth_pos.z));
+        render.init(cloth->springs, defaultColor, cloth->cloth_pos);
     }
     
     void flush() { render.flush(); }
@@ -406,8 +406,8 @@ struct RigidRender {
         vboNor = new glm::vec3[vertexCount];
         for (int i = 0; i < vertexCount; i ++) {
             Vertex* v = faces[i];
-            vboPos[i] = glm::vec3(v->position.x, v->position.y, v->position.z);
-            vboNor[i] = glm::vec3(v->normal.x, v->normal.y, v->normal.z);
+            vboPos[i] = glm::vec3(v->position);
+            vboNor[i] = glm::vec3(v->normal);
         }
         
         /** Build render program **/
@@ -510,7 +510,7 @@ struct BallRender {
     
     BallRender(Ball* b) {
         ball = b;
-        render.init(ball->sphere->faces, ball->color, glm::vec3(ball->center.x, ball->center.y, ball->center.z));
+        render.init(ball->sphere->faces, ball->color, ball->center);
     }
     
     void flush() { render.flush(); }

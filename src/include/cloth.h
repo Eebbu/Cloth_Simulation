@@ -17,8 +17,7 @@ public:
     const double  shear_coef = 300.0;
     const double  bending_coef = 300.0;
     double damp_coef = 0.1;
-    Vec3 gravity = Vec3(0.0, -2.0, 0.0);
-    Vec3 center = Vec3(0, 10, 0);
+    glm::dvec3 gravity = glm::dvec3(0.0, -2.0, 0.0);
     
     enum DrawModeEnum {
         DRAW_NODES,
@@ -28,7 +27,7 @@ public:
 
     DrawModeEnum drawMode = DRAW_LINES;
     
-    Vec3 cloth_pos = Vec3(-5, 16, 0);
+    glm::vec3 cloth_pos = glm::vec3(-5, 16, 0);
     std::vector<Mass*>   masses;
 	std::vector<Spring*> springs;
 	std::vector<Mass*>   faces;
@@ -55,7 +54,7 @@ public:
         return masses[y * mass_per_row + x]; 
     }
 
-    void fixed_mass(Mass* mass, Vec3 offset) {
+    void fixed_mass(Mass* mass, glm::dvec3 offset) {
         mass->position += offset;
         mass->is_fixed = true;
     }
@@ -65,7 +64,7 @@ public:
         for (int i = 0; i < mass_per_row; i ++) {
             for (int j = 0; j < mass_per_col; j ++) {
                 /** Create mass by position **/
-                Mass* mass = new Mass(Vec3((double)j/mass_density, 0, ((double)i/mass_density)), false);
+                Mass* mass = new Mass(glm::dvec3((double)j/mass_density, 0, ((double)i/mass_density)), false);
                 /** Set texture coordinates **/
                 mass->tex_coord.x = (double)j/(mass_per_row-1);
                 mass->tex_coord.y = (double)i/(1-mass_per_col);
@@ -95,8 +94,8 @@ public:
             }
         }
 
-        fixed_mass(get_mass(0, 0), Vec3(1.0, 0.0, 0.0));
-        fixed_mass(get_mass(mass_per_row-1, 0), Vec3(-1.0, 0.0, 0.0));
+        fixed_mass(get_mass(0, 0), glm::dvec3(1.0, 0.0, 0.0));
+        fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-1.0, 0.0, 0.0));
 
 		/** Triangle faces **/
         for (int i = 0; i < mass_per_row-1; i ++) {
@@ -120,8 +119,8 @@ public:
             Mass* m2 = faces[3*i+1];
             Mass* m3 = faces[3*i+2];
             
-            Vec3 normal = Vec3::cross(m2->position - m1->position, m3->position - m1->position);
-            normal.normalize();
+            glm::dvec3 normal = glm::cross(m2->position - m1->position, m3->position - m1->position);
+            normal = glm::normalize(normal);
             m1->normal = normal;
             m2->normal = normal;
             m3->normal = normal;
@@ -130,18 +129,18 @@ public:
 
     void step(Ball* ball, double delta_t) {
         for (auto &spring: this->springs) {
-            Vec3 spring_vec = spring->mass1->position - spring->mass2->position;
-            double spring_length = Vec3::dist(spring->mass1->position, spring->mass2->position);
+            glm::dvec3 spring_vec = spring->mass1->position - spring->mass2->position;
+            double spring_length = glm::length(spring_vec);
 
-            Vec3 force = spring_vec * spring->spring_constant  / spring_length * (spring_length - spring->rest_len);
-            spring->mass1->force += force.minus();
+            glm::dvec3 force = spring_vec * spring->spring_constant  / spring_length * (spring_length - spring->rest_len);
+            spring->mass1->force += -force;
             spring->mass2->force += force;
         }
 
         for (auto &mass : this->masses) {
             if (!mass->is_fixed) {
-                Vec3 a = mass->force / mass->m + gravity;
-                Vec3 last_position = mass->position;
+                glm::dvec3 a = mass->force / mass->m + gravity;
+                glm::dvec3 last_position = mass->position;
                 mass->position += (mass->position - mass->last_position) * (1 - this->damp_coef) + a * delta_t * delta_t;
                 mass->last_position = last_position;
 
@@ -149,33 +148,15 @@ public:
                 // mass->velocity += mass->force/mass->m*delta_t;
                 // mass->position += mass->velocity*delta_t;
             }
-            mass->force = Vec3(0.0, 0.0, 0.0); 
+            mass->force = glm::dvec3(0.0, 0.0, 0.0); 
         }
        //  collisionResponse(ball);
     }
 	
-	void addForce(Vec3 f) {		 
+	void addForce(glm::dvec3 f) {		 
 		for (int i = 0; i < masses.size(); i++) {
-			masses[i]->addForce(f);
+			masses[i]->force += f;
 		}
-	}
-
-	void computeForce(double timeStep, Vec3 gravity) {
-        /** Masses **/
-		for (int i = 0; i < masses.size(); i++) {
-			masses[i]->addForce(gravity * masses[i]->m);
-		}
-		/** Springs **/
-		for (int i = 0; i < springs.size(); i++) {
-			springs[i]->applyInternalForce(timeStep);
-		}
-	}
-
-	void integrate(double airFriction, double timeStep) {
-        /** Mass* */
-        for (int i = 0; i < masses.size(); i++) {
-            masses[i]->step(timeStep);
-        }
 	}
 	
     // Vec3 getWorldPos(Mass* n) { 
