@@ -18,7 +18,8 @@ public:
     const double      damp_coef       = 0.1;
     const glm::dvec3  gravity         = glm::dvec3(0.0, -2.0, 0.0);
     const glm::vec3   cloth_pos       = glm::vec3(-5, 16, 0);
-    const bool        draw_texture    = true;
+    const bool        draw_texture    = false;
+    const int constraints_iterations  = 10;
     
     std::vector<Mass*>   masses;
 	std::vector<Spring*> springs;
@@ -134,7 +135,42 @@ public:
             }
             mass->force = glm::dvec3(0.0, 0.0, 0.0); 
         }
+
+        solve_constraints(0);
+        update_velocity_after_constraints(delta_t);
        //  collisionResponse(ball);
+    }
+
+    void solve_constraints(int iterations) {
+        for (int i = 0; i< this->constraints_iterations; i++) {
+            for (auto &spring : springs) {
+                double current_length = spring->get_length();
+                if (current_length <= spring->max_len) {
+                    continue;
+                }
+                if (spring->mass1->is_fixed && spring->mass2->is_fixed) {
+                    continue;
+                }
+                
+                glm::dvec3 direction = (spring->mass2->position - spring->mass1->position) / current_length;
+                double delta = current_length - spring->max_len;
+                double mass_sum = (spring->mass1->is_fixed ? 0.0 : 1.0) + (spring->mass2->is_fixed ? 0.0 : 1.0);
+                double correction = delta / mass_sum;
+
+                if (!spring->mass1->is_fixed) {
+                    spring->mass1->position += direction * correction;
+                }
+                if (!spring->mass2->is_fixed) {
+                    spring->mass2->position -= direction * correction;
+                }
+            }
+        }
+    }
+
+    void update_velocity_after_constraints(double delta_t) {
+        for(auto &mass: masses) {
+            mass->velocity = (mass->position - mass->last_position) / delta_t;
+        }
     }
 
     void compute_normal() {
