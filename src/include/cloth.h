@@ -7,33 +7,30 @@
 
 class Cloth {
 public:
-    const int     mass_density = 4;
-    const int     iteration_freq = 25;
-    const int     width = 10;
-    const int     height = 10;
-    const int     mass_per_row = 40;
-    const int     mass_per_col = 40;
-    const double  structural_coef = 300.0;
-    const double  shear_coef = 300.0;
-    const double  bending_coef = 300.0;
-    double damp_coef = 0.1;
-    glm::dvec3 gravity = glm::dvec3(0.0, -2.0, 0.0);
+    const int         mass_density    = 4;
+    const int         width           = 10;
+    const int         height          = 10;
+    const int         mass_per_row    = 40;
+    const int         mass_per_col    = 40;
+    const double      structural_coef = 300.0;
+    const double      shear_coef      = 300.0;
+    const double      bending_coef    = 300.0;
+    const double      damp_coef       = 0.1;
+    const glm::dvec3  gravity         = glm::dvec3(0.0, -2.0, 0.0);
+    const glm::vec3   cloth_pos       = glm::vec3(-5, 16, 0);
+    const bool        draw_texture    = false;
     
-    enum DrawModeEnum {
-        DRAW_NODES,
-        DRAW_LINES,
-        DRAW_FACES
-    };
-
-    DrawModeEnum drawMode = DRAW_LINES;
-    
-    glm::vec3 cloth_pos = glm::vec3(-5, 16, 0);
     std::vector<Mass*>   masses;
 	std::vector<Spring*> springs;
 	std::vector<Mass*>   faces;
     
 	Cloth() {
-        init();
+        initialize_masses();
+        link_springs();
+        initialize_face();
+
+        fixed_mass(get_mass(0, 0), glm::dvec3(1.0, 0.0, 0.0));
+        fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-1.0, 0.0, 0.0));
 	}
 
 	~Cloth() { 
@@ -58,46 +55,47 @@ public:
         mass->position += offset;
         mass->is_fixed = true;
     }
-    
-	void init() {
-        /** Add masses **/
+
+    void initialize_masses() {
         for (int i = 0; i < mass_per_row; i ++) {
             for (int j = 0; j < mass_per_col; j ++) {
-                /** Create mass by position **/
-                Mass* mass = new Mass(glm::dvec3((double)j/mass_density, 0, ((double)i/mass_density)), false);
-                /** Set texture coordinates **/
-                mass->tex_coord.x = (double)j/(mass_per_row-1);
-                mass->tex_coord.y = (double)i/(1-mass_per_col);
-                /** Add mass to cloth **/
+                glm::dvec2 text_coord((double)j/(mass_per_row-1), (double)i/(1-mass_per_col));
+                glm::dvec3 position((double)j/mass_density, 0, (double)i/mass_density);
+                Mass* mass = new Mass(position, text_coord, false);
                 masses.push_back(mass);
             }
         }
-        
-        /** Add springs **/
+    }
+
+    void link_springs() {
         for (int i = 0; i < mass_per_row; i ++) {
             for (int j = 0; j < mass_per_col; j ++) {
-                /** Structural **/
+                // structural springs
                 if (i < mass_per_row-1) {
                     springs.push_back(new Spring(get_mass(i, j), get_mass(i+1, j), structural_coef));
                 }
                 if (j < mass_per_col-1) {
                     springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+1), structural_coef));
                 }
-                /** Shear **/
+                
+                // shear springs
                 if (i < mass_per_row-1 && j < mass_per_col-1) {
                     springs.push_back(new Spring(get_mass(i, j), get_mass(i+1, j+1), shear_coef));
                     springs.push_back(new Spring(get_mass(i+1, j), get_mass(i, j+1), shear_coef));
                 }
-                /** Bending **/
-                if (i < mass_per_row-2) springs.push_back(new Spring(get_mass(i, j), get_mass(i+2, j), bending_coef));
-                if (j < mass_per_col-2) springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+2), bending_coef));
+                
+                // flexion springs
+                if (i < mass_per_row-2) {
+                    springs.push_back(new Spring(get_mass(i, j), get_mass(i+2, j), bending_coef));
+                }
+                if (j < mass_per_col-2) {
+                    springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+2), bending_coef));
+                }
             }
         }
-
-        fixed_mass(get_mass(0, 0), glm::dvec3(1.0, 0.0, 0.0));
-        fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-1.0, 0.0, 0.0));
-
-		/** Triangle faces **/
+    }
+    
+	void initialize_face() {
         for (int i = 0; i < mass_per_row-1; i ++) {
             for (int j = 0; j < mass_per_col-1; j ++) {
                 // Left upper triangle
@@ -112,8 +110,8 @@ public:
             }
         }
 	}
-	
-	void computeNormal() {
+
+    void computeNormal() {
         for (int i = 0; i < faces.size()/3; i ++) { 
             Mass* m1 = faces[3*i+0];
             Mass* m2 = faces[3*i+1];
@@ -153,7 +151,7 @@ public:
        //  collisionResponse(ball);
     }
 	
-	void addForce(glm::dvec3 f) {		 
+	void add_force(glm::dvec3 f) {		 
 		for (int i = 0; i < masses.size(); i++) {
 			masses[i]->force += f;
 		}

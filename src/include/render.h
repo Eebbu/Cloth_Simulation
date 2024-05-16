@@ -199,16 +199,10 @@ struct ClothRender {
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
         /** Draw **/
-        switch (cloth->drawMode) {
-            case Cloth::DRAW_NODES:
-                glDrawArrays(GL_POINTS, 0, massCount);
-                break;
-            case Cloth::DRAW_LINES:
-                glDrawArrays(GL_LINES, 0, massCount);
-                break;
-            default:
-                glDrawArrays(GL_TRIANGLES, 0, massCount);
-                break;
+        if (cloth->draw_texture) {
+            glDrawArrays(GL_TRIANGLES, 0, massCount);
+        } else {
+            glDrawArrays(GL_LINES, 0, massCount);
         }
         
         // End flushing
