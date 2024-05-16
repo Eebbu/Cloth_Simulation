@@ -15,8 +15,8 @@ public:
     const double      structural_coef = 300.0;
     const double      shear_coef      = 200.0;
     const double      bending_coef    = 200.0;
-    const double      damp_coef       = 0.1;
-    const glm::dvec3  gravity         = glm::dvec3(0.0, -2.0, 0.0);
+    const double      damp_coef       = 0.65;
+    const glm::dvec3  gravity         = glm::dvec3(0.0, -1.0, 0.0);
     const glm::vec3   cloth_pos       = glm::vec3(-5, 16, 0);
     const bool        draw_texture    = false;
     const int constraints_iterations  = 10;
@@ -112,7 +112,28 @@ public:
         }
 	}
 
+    void compute_spring_forces() {
+        for (auto &spring: this->springs) {
+            glm::dvec3 spring_vec = spring->mass1->position - spring->mass2->position;
+            double spring_length = glm::length(spring_vec);
+
+            glm::dvec3 damp_force = damp_coef * (spring->mass1->position - spring->mass2->position);
+            glm::dvec3 force = spring_vec * spring->spring_constant  / spring_length * (spring_length - spring->rest_len);
+            spring->mass1->force += -force - damp_force;
+            spring->mass2->force += force + damp_force;
+        }
+    }
+
+    void apply_gravity() {
+        for (auto &mass : this->masses) {
+            if (!mass->is_fixed) {
+                mass->force += gravity * mass->m;
+            }
+        }
+    }
+
     void step(Ball* ball, double delta_t) {
+        // remeber set damp_coef to 0.65
         for (auto &spring: this->springs) {
             glm::dvec3 spring_vec = spring->mass1->position - spring->mass2->position;
             double spring_length = glm::length(spring_vec);
@@ -124,14 +145,10 @@ public:
 
         for (auto &mass : this->masses) {
             if (!mass->is_fixed) {
-                glm::dvec3 a = mass->force / mass->m + gravity;
-                glm::dvec3 last_position = mass->position;
-                mass->position += (mass->position - mass->last_position) * (1 - this->damp_coef) + a * delta_t * delta_t;
-                mass->last_position = last_position;
-
-                // mass->force += gravity * mass->m - mass->velocity * this->damp_coef;
-                // mass->velocity += mass->force/mass->m*delta_t;
-                // mass->position += mass->velocity*delta_t;
+                mass->last_position = mass->position;
+                mass->force += gravity * mass->m - mass->velocity * this->damp_coef;
+                mass->velocity += mass->force/mass->m*delta_t;
+                mass->position += mass->velocity*delta_t;
             }
             mass->force = glm::dvec3(0.0, 0.0, 0.0); 
         }
@@ -141,8 +158,108 @@ public:
        //  collisionResponse(ball);
     }
 
+    void rk4_step(Ball* ball, double delta_t) {
+        // remeber set damp_coef to 200
+        std::vector<glm::dvec3> initial_positions;
+        std::vector<glm::dvec3> initial_velocities;
+        std::vector<glm::dvec3> k1_positions;
+        std::vector<glm::dvec3> k1_velocities;
+        std::vector<glm::dvec3> k2_positions;
+        std::vector<glm::dvec3> k2_velocities;
+        std::vector<glm::dvec3> k3_positions;
+        std::vector<glm::dvec3> k3_velocities;
+        std::vector<glm::dvec3> k4_positions;
+        std::vector<glm::dvec3> k4_velocities;
+
+        for (auto& mass : masses) {
+            mass->last_position = mass->position;
+            initial_positions.push_back(mass->position);
+            initial_velocities.push_back(mass->velocity);
+            k1_positions.push_back(glm::dvec3(0.0));
+            k1_velocities.push_back(glm::dvec3(0.0));
+            k2_positions.push_back(glm::dvec3(0.0));
+            k2_velocities.push_back(glm::dvec3(0.0));
+            k3_positions.push_back(glm::dvec3(0.0));
+            k3_velocities.push_back(glm::dvec3(0.0));
+            k4_positions.push_back(glm::dvec3(0.0));
+            k4_velocities.push_back(glm::dvec3(0.0));
+        }
+
+        // k1
+        compute_spring_forces();
+        apply_gravity();
+        for (size_t i = 0; i < masses.size(); ++i) {
+            if (!masses[i]->is_fixed) {
+                k1_positions[i] = masses[i]->velocity * delta_t;
+                k1_velocities[i] = masses[i]->force / masses[i]->m * delta_t;
+            }
+        }
+
+        // k2
+        for (size_t i = 0; i < masses.size(); ++i) {
+            if (!masses[i]->is_fixed) {
+                masses[i]->position = initial_positions[i] + 0.5 * k1_positions[i];
+                masses[i]->velocity = initial_velocities[i] + 0.5 * k1_velocities[i];
+            }
+        }
+        compute_spring_forces();
+        apply_gravity();
+        for (size_t i = 0; i < masses.size(); ++i) {
+            if (!masses[i]->is_fixed) {
+                k2_positions[i] = masses[i]->velocity * delta_t;
+                k2_velocities[i] = masses[i]->force / masses[i]->m * delta_t;
+            }
+        }
+
+        // k3
+        for (size_t i = 0; i < masses.size(); ++i) {
+            if (!masses[i]->is_fixed) {
+                masses[i]->position = initial_positions[i] + 0.5 * k2_positions[i];
+                masses[i]->velocity = initial_velocities[i] + 0.5 * k2_velocities[i];
+            }
+        }
+        compute_spring_forces();
+        apply_gravity();
+        for (size_t i = 0; i < masses.size(); ++i) {
+            if (!masses[i]->is_fixed) {
+                k3_positions[i] = masses[i]->velocity * delta_t;
+                k3_velocities[i] = masses[i]->force / masses[i]->m * delta_t;
+            }
+        }
+
+        // k4
+        for (size_t i = 0; i < masses.size(); ++i) {
+            if (!masses[i]->is_fixed) {
+                masses[i]->position = initial_positions[i] + k3_positions[i];
+                masses[i]->velocity = initial_velocities[i] + k3_velocities[i];
+            }
+        }
+        compute_spring_forces();
+        apply_gravity();
+        for (size_t i = 0; i < masses.size(); ++i) {
+            if (!masses[i]->is_fixed) {
+                k4_positions[i] = masses[i]->velocity * delta_t;
+                k4_velocities[i] = masses[i]->force / masses[i]->m * delta_t;
+            }
+        }
+
+        // Combine
+        for (size_t i = 0; i < masses.size(); ++i) {
+            if (!masses[i]->is_fixed) {
+                masses[i]->position = initial_positions[i] + (k1_positions[i] + 2.0 * k2_positions[i] + 2.0 * k3_positions[i] + k4_positions[i]) / 6.0;
+                masses[i]->velocity = initial_velocities[i] + (k1_velocities[i] + 2.0 * k2_velocities[i] + 2.0 * k3_velocities[i] + k4_velocities[i]) / 6.0;
+            }
+            masses[i]->force = glm::dvec3(0.0);  // Reset force for the next timestep
+        }
+
+        solve_constraints(0);
+        update_velocity_after_constraints(delta_t);
+       //  collisionResponse(ball);
+    }
+
     void solve_constraints(int iterations) {
         for (int i = 0; i< this->constraints_iterations; i++) {
+            bool normal = true;
             for (auto &spring : springs) {
                 double current_length = spring->get_length();
                 if (current_length <= spring->max_len) {
@@ -159,10 +276,15 @@ public:
 
                 if (!spring->mass1->is_fixed) {
                     spring->mass1->position += direction * correction;
+                    normal = false;
                 }
                 if (!spring->mass2->is_fixed) {
                     spring->mass2->position -= direction * correction;
+                    normal = false;
                 }
+            }
+            if (normal) {
+                return;
             }
         }
     }
