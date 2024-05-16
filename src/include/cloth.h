@@ -111,20 +111,6 @@ public:
         }
 	}
 
-    void computeNormal() {
-        for (int i = 0; i < faces.size()/3; i ++) { 
-            Mass* m1 = faces[3*i+0];
-            Mass* m2 = faces[3*i+1];
-            Mass* m3 = faces[3*i+2];
-            
-            glm::dvec3 normal = glm::cross(m2->position - m1->position, m3->position - m1->position);
-            normal = glm::normalize(normal);
-            m1->normal = normal;
-            m2->normal = normal;
-            m3->normal = normal;
-        }
-	}
-
     void step(Ball* ball, double delta_t) {
         for (auto &spring: this->springs) {
             glm::dvec3 spring_vec = spring->mass1->position - spring->mass2->position;
@@ -150,6 +136,20 @@ public:
         }
        //  collisionResponse(ball);
     }
+
+    void compute_normal() {
+        for (int i = 0; i < faces.size()/3; i ++) { 
+            Mass* m1 = faces[3*i+0];
+            Mass* m2 = faces[3*i+1];
+            Mass* m3 = faces[3*i+2];
+            
+            glm::dvec3 normal = glm::cross(m2->position - m1->position, m3->position - m1->position);
+            normal = glm::normalize(normal);
+            m1->normal = normal;
+            m2->normal = normal;
+            m3->normal = normal;
+        }
+	}
 	
 	void add_force(glm::dvec3 f) {		 
 		for (int i = 0; i < masses.size(); i++) {
