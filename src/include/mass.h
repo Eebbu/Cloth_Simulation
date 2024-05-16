@@ -8,9 +8,10 @@ public:
     glm::dvec3  normal;
     glm::dvec3	position;
     glm::dvec3  last_position;
-    glm::dvec3  velocity = glm::dvec3(0, 0, 0);
-    glm::dvec3  force = glm::dvec3(0, 0, 0);
+    glm::dvec3  velocity     = glm::dvec3(0, 0, 0);
     glm::dvec3	acceleration = glm::dvec3(0, 0, 0);
+    glm::dvec3  force        = glm::dvec3(0, 0, 0);
+
 
 public:
     Mass(void) {}

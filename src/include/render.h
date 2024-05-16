@@ -8,12 +8,12 @@
 #include "stb_image.h"
 
 struct Camera {
-    const float speed = 0.05f;
+    const float speed        = 0.05f;
     const float frustumRatio = 1.0f;
     
-    glm::vec3 pos = glm::vec3(0.0f, 10.0f, 25.0f);
+    glm::vec3 pos   = glm::vec3(0.0f, 10.0f, 25.0f);
     glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 up    = glm::vec3(0.0f, 1.0f, 0.0f);
     
     glm::mat4 uniProjMatrix;
     glm::mat4 uniViewMatrix;
@@ -29,7 +29,7 @@ struct Camera {
 Camera cam;
 
 struct Light {
-    glm::vec3 pos = glm::vec3(-5.0f, 7.0f, 6.0f);
+    glm::vec3 pos   = glm::vec3(-5.0f, 7.0f, 6.0f);
     glm::vec3 color = glm::vec3(0.7f, 0.7f, 1.0f);
 };
 Light sun;
