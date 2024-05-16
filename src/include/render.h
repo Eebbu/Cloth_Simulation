@@ -123,7 +123,7 @@ struct ClothRender {
             // Automatically generate all the required mipmaps for the currently bound texture.
             glGenerateMipmap(GL_TEXTURE_2D);
         } else {
-            cout << "Failed to load texture" << endl;
+            std::cout << "Failed to load texture" << std::endl;
         }
         // Always free image memory
         stbi_image_free(data);
