@@ -14,34 +14,21 @@ public:
 
 class Mass {
 public:
-    double  m;           
-    bool    is_fixed;       
-    glm::dvec2    tex_coord;       
-    glm::dvec3    normal;         
+    double      m = 1.0;           
+    bool        is_fixed = false;       
+    glm::dvec2  tex_coord;       
+    glm::dvec3  normal;         
 	glm::dvec3	position;
-    glm::dvec3    velocity;
-    glm::dvec3    force;
-	glm::dvec3	acceleration;
-    glm::dvec3 last_position;
+    glm::dvec3  last_position;
+    glm::dvec3  velocity = glm::dvec3(0, 0, 0);
+    glm::dvec3  force = glm::dvec3(0, 0, 0);
+	glm::dvec3	acceleration = glm::dvec3(0, 0, 0);
 
 public:
-    Mass(void) {
-        m = 1.0;
-        is_fixed = false;
-        velocity = glm::dvec3(0, 0, 0);
-        force = glm::dvec3(0, 0, 0);
-        acceleration = glm::dvec3(0, 0, 0);
-    }
-	Mass(glm::dvec3 pos, bool _is_fixed) {
-        m = 1.0;
-        is_fixed = _is_fixed;
-        position = pos;
-        last_position = pos;
-        velocity = glm::dvec3(0, 0, 0);
-        force = glm::dvec3(0, 0, 0);
-        acceleration = glm::dvec3(0, 0, 0);
-    }
+    Mass(void) {}
 
-	~Mass(void) {}
+	Mass(glm::dvec3 _pos, glm::dvec2 _tex_coord, bool _is_fixed)
+        : position(_pos), last_position(_pos), tex_coord(_tex_coord), is_fixed(_is_fixed) {}
 
+	~Mass() {}
 };

@@ -102,10 +102,10 @@ int main(int argc, const char * argv[]) {
         cloth.computeNormal();
         
         /** Display **/
-        if (cloth.drawMode == Cloth::DRAW_LINES) {
-            clothSpringRender.flush();
-        } else {
+        if (cloth.draw_texture) {
             clothRender.flush();
+        } else {
+            clothSpringRender.flush();
         }
         ballRender.flush();
         
@@ -153,6 +153,6 @@ void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
         windDir = glm::dvec3(xpos, -ypos, 0) - windStartPos;
         windDir = glm::normalize(windDir);
         wind = windDir * windForceScale;
-        cloth.addForce(wind);
+        cloth.add_force(wind);
     }
 }
