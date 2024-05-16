@@ -30,7 +30,7 @@ void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos);
 int windBlowing = 0;
 double windForceScale = 15.0;
 glm::dvec3 windStartPos;
-glm::dvec3  windDir;
+glm::dvec3 windDir;
 glm::dvec3 wind;
 Cloth cloth;
 

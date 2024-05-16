@@ -13,12 +13,12 @@ public:
     const int         mass_per_row    = 40;
     const int         mass_per_col    = 40;
     const double      structural_coef = 300.0;
-    const double      shear_coef      = 300.0;
-    const double      bending_coef    = 300.0;
+    const double      shear_coef      = 200.0;
+    const double      bending_coef    = 200.0;
     const double      damp_coef       = 0.1;
     const glm::dvec3  gravity         = glm::dvec3(0.0, -2.0, 0.0);
     const glm::vec3   cloth_pos       = glm::vec3(-5, 16, 0);
-    const bool        draw_texture    = false;
+    const bool        draw_texture    = true;
     
     std::vector<Mass*>   masses;
 	std::vector<Spring*> springs;
@@ -33,18 +33,18 @@ public:
         fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-1.0, 0.0, 0.0));
 	}
 
-	~Cloth() { 
-		for (int i = 0; i < masses.size(); i++) {
+	~Cloth() {
+        for (int i = 0; i < masses.size(); i++) {
             delete masses[i];
         }
-		for (int i = 0; i < springs.size(); i++) {
+
+        for (int i = 0; i < springs.size(); i++) {
             delete springs[i];
         }
-
         masses.clear();
         springs.clear();
         faces.clear();
-	}
+    }
  
 public:
     Mass* get_mass(int x, int y) { 

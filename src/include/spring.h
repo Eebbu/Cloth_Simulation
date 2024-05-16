@@ -6,8 +6,8 @@ using namespace std;
 
 class Spring {
 public:
-    Mass* mass1;
-    Mass* mass2;
+    Mass*  mass1;
+    Mass*  mass2;
 	double rest_len;
     double spring_constant;
     
