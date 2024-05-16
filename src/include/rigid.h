@@ -5,7 +5,17 @@
 #include <cmath>
 #include <vector>
 
-#include "points.h"
+struct Vertex {
+public:
+    glm::dvec3 position;
+    glm::dvec3 normal;
+    
+    Vertex() {}
+    Vertex(glm::dvec3 pos) {
+        position = pos;
+    }
+    ~Vertex() {}
+};
 
 class Sphere {
 public:

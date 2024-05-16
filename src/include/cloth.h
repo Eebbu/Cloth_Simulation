@@ -34,16 +34,16 @@ public:
 	}
 
 	~Cloth() { 
-		for (int i = 0; i < masses.size(); i++) { 
-            delete masses[i]; 
+		for (int i = 0; i < masses.size(); i++) {
+            delete masses[i];
         }
-		for (int i = 0; i < springs.size(); i++) { 
-            delete springs[i]; 
+		for (int i = 0; i < springs.size(); i++) {
+            delete springs[i];
         }
 
-		masses.clear();
-		springs.clear();
-		faces.clear();
+        masses.clear();
+        springs.clear();
+        faces.clear();
 	}
  
 public:
@@ -152,10 +152,10 @@ public:
 	}
 	
 	void add_force(glm::dvec3 f) {		 
-		for (int i = 0; i < masses.size(); i++) {
-			masses[i]->force += f;
-		}
-	}
+        for (int i = 0; i < masses.size(); i++) {
+            masses[i]->force += f;
+        }
+    }
 	
     // Vec3 getWorldPos(Mass* n) { 
     //     return cloth_pos + n->position; 
