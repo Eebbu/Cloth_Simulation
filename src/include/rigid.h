@@ -17,7 +17,7 @@ public:
     std::vector<Vertex*> vertexes;
     std::vector<Vertex*> faces;
     
-    Sphere(int r) {
+    Sphere(int r, Vec3 center) {
         radius = r;
         init();
     }
@@ -127,7 +127,7 @@ public:
 };
 
 struct Ball {
-    const Vec3       center = Vec3(0, 3, -2);
+    const Vec3       center = Vec3(0, 6, 0);
     const int        radius = 1;
     const glm::vec4  color = glm::vec4(0.6f, 0.5f, 0.8f, 1.0f);
     const double     friction = 0.8;
@@ -135,7 +135,7 @@ struct Ball {
     Sphere* sphere;
     
     Ball() {
-        sphere = new Sphere(radius);
+        sphere = new Sphere(radius, center);
     }
     ~Ball() {}
 };

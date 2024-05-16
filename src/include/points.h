@@ -24,6 +24,7 @@ public:
     Vec3    velocity;
     Vec3    force;
 	Vec3	acceleration;
+    Vec3 last_position;
 
 public:
     Mass(void) {
@@ -37,6 +38,7 @@ public:
         m = 1.0;
         is_fixed = _is_fixed;
         position = pos;
+        last_position = pos;
         velocity.setZeroVec();
         force.setZeroVec();
         acceleration.setZeroVec();

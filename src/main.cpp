@@ -13,6 +13,7 @@
 #include "include/rigid.h"
 #include "include/program.h"
 #include "include/render.h"
+#include <thread>
 
 #define WIDTH 800
 #define HEIGHT 800
@@ -79,23 +80,25 @@ int main(int argc, const char * argv[]) {
     ClothSpringRender clothSpringRender(&cloth);
     BallRender ballRender(&ball);
     
-    Vec3 initForce(10.0, 40.0, 20.0);
-    cloth.addForce(initForce);
+    // Vec3 initForce(10.0, 40.0, 20.0);
+    // cloth.addForce(initForce);
     
     glEnable(GL_DEPTH_TEST);
     glPointSize(3);
     
+    bool a = true;
     /** Redering loop **/
     while (!glfwWindowShouldClose(window)) {
+        auto start = std::chrono::high_resolution_clock::now();
+
         /** Set background clolor **/
         glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.0); // Set color value (R,G,B,A) - Set Status
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
-        for (int i = 0; i < cloth.iteration_freq; i ++) {
-            cloth.computeForce(TIME_STEP, gravity);
-            cloth.integrate(AIR_FRICTION, TIME_STEP);
-            cloth.collisionResponse(&ball);
+        for (int i = 0; i < 25; i ++) {
+            cloth.step(&ball, TIME_STEP);
         }
         cloth.computeNormal();
         
@@ -107,10 +110,19 @@ int main(int argc, const char * argv[]) {
         }
         ballRender.flush();
         
+        
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
         
         glfwSwapBuffers(window);
         glfwPollEvents(); // Update the status of window
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+        int remaining_time = 1000000 / 60 - duration.count();
+        if (remaining_time > 0) {
+            std::this_thread::sleep_for(std::chrono::microseconds(remaining_time));
+        }
     }
 
     glfwTerminate();

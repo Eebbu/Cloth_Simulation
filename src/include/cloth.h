@@ -9,13 +9,16 @@ class Cloth {
 public:
     const int     mass_density = 4;
     const int     iteration_freq = 25;
-    const int     width = 6;
-    const int     height = 6;
-    const int     mass_per_row = mass_density * width;
-    const int     mass_per_col = mass_density * height;
-    const double  structural_coef = 600.0;
-    const double  shear_coef = 40.0;
+    const int     width = 10;
+    const int     height = 10;
+    const int     mass_per_row = 40;
+    const int     mass_per_col = 40;
+    const double  structural_coef = 300.0;
+    const double  shear_coef = 300.0;
     const double  bending_coef = 300.0;
+    double damp_coef = 0.1;
+    Vec3 gravity = Vec3(0.0, -2.0, 0.0);
+    Vec3 center = Vec3(0, 10, 0);
     
     enum DrawModeEnum {
         DRAW_NODES,
@@ -23,9 +26,9 @@ public:
         DRAW_FACES
     };
 
-    DrawModeEnum drawMode = DRAW_FACES;
+    DrawModeEnum drawMode = DRAW_LINES;
     
-    Vec3 cloth_pos = Vec3(-3, 7.5, -2);
+    Vec3 cloth_pos = Vec3(-5, 16, 0);
     std::vector<Mass*>   masses;
 	std::vector<Spring*> springs;
 	std::vector<Mass*>   faces;
@@ -62,7 +65,7 @@ public:
         for (int i = 0; i < mass_per_row; i ++) {
             for (int j = 0; j < mass_per_col; j ++) {
                 /** Create mass by position **/
-                Mass* mass = new Mass(Vec3((double)j/mass_density, -((double)i/mass_density), 0), false);
+                Mass* mass = new Mass(Vec3((double)j/mass_density, 0, ((double)i/mass_density)), false);
                 /** Set texture coordinates **/
                 mass->tex_coord.x = (double)j/(mass_per_row-1);
                 mass->tex_coord.y = (double)i/(1-mass_per_col);
@@ -75,8 +78,12 @@ public:
         for (int i = 0; i < mass_per_row; i ++) {
             for (int j = 0; j < mass_per_col; j ++) {
                 /** Structural **/
-                if (i < mass_per_row-1) springs.push_back(new Spring(get_mass(i, j), get_mass(i+1, j), structural_coef));
-                if (j < mass_per_col-1) springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+1), structural_coef));
+                if (i < mass_per_row-1) {
+                    springs.push_back(new Spring(get_mass(i, j), get_mass(i+1, j), structural_coef));
+                }
+                if (j < mass_per_col-1) {
+                    springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+1), structural_coef));
+                }
                 /** Shear **/
                 if (i < mass_per_row-1 && j < mass_per_col-1) {
                     springs.push_back(new Spring(get_mass(i, j), get_mass(i+1, j+1), shear_coef));
@@ -98,6 +105,7 @@ public:
                 faces.push_back(get_mass(i+1, j));
                 faces.push_back(get_mass(i, j));
                 faces.push_back(get_mass(i, j+1));
+
                 // Right bottom triangle
                 faces.push_back(get_mass(i+1, j+1));
                 faces.push_back(get_mass(i+1, j));
@@ -119,6 +127,32 @@ public:
             m3->normal = normal;
         }
 	}
+
+    void step(Ball* ball, double delta_t) {
+        for (auto &spring: this->springs) {
+            Vec3 spring_vec = spring->mass1->position - spring->mass2->position;
+            double spring_length = Vec3::dist(spring->mass1->position, spring->mass2->position);
+
+            Vec3 force = spring_vec * spring->spring_constant  / spring_length * (spring_length - spring->rest_len);
+            spring->mass1->force += force.minus();
+            spring->mass2->force += force;
+        }
+
+        for (auto &mass : this->masses) {
+            if (!mass->is_fixed) {
+                Vec3 a = mass->force / mass->m + gravity;
+                Vec3 last_position = mass->position;
+                mass->position += (mass->position - mass->last_position) * (1 - this->damp_coef) + a * delta_t * delta_t;
+                mass->last_position = last_position;
+
+                // mass->force += gravity * mass->m - mass->velocity * this->damp_coef;
+                // mass->velocity += mass->force/mass->m*delta_t;
+                // mass->position += mass->velocity*delta_t;
+            }
+            mass->force = Vec3(0.0, 0.0, 0.0); 
+        }
+       //  collisionResponse(ball);
+    }
 	
 	void addForce(Vec3 f) {		 
 		for (int i = 0; i < masses.size(); i++) {
@@ -144,25 +178,25 @@ public:
         }
 	}
 	
-    Vec3 getWorldPos(Mass* n) { 
-        return cloth_pos + n->position; 
-    }
+    // Vec3 getWorldPos(Mass* n) { 
+    //     return cloth_pos + n->position; 
+    // }
 
-    void setWorldPos(Mass* n, Vec3 pos) { 
-        n->position = pos - cloth_pos; 
-    }
+    // void setWorldPos(Mass* n, Vec3 pos) { 
+    //     n->position = pos - cloth_pos; 
+    // }
     
-	void collisionResponse(Ball* ball) {
-        for (int i = 0; i < masses.size(); i++) {   
-            /** Ball collision **/
-            Vec3 distVec = getWorldPos(masses[i]) - ball->center;
-            double distLen = distVec.length();
-            double safeDist = ball->radius*1.05;
-            if (distLen < safeDist) {
-                distVec.normalize();
-                setWorldPos(masses[i], distVec*safeDist+ball->center);
-                masses[i]->velocity = masses[i]->velocity*ball->friction;
-            }
-        }
-	}
+	// void collisionResponse(Ball* ball) {
+    //     for (int i = 0; i < masses.size(); i++) {   
+    //         /** Ball collision **/
+    //         Vec3 distVec = getWorldPos(masses[i]) - ball->center;
+    //         double distLen = distVec.length();
+    //         double safeDist = ball->radius*1.05;
+    //         if (distLen < safeDist) {
+    //             distVec.normalize();
+    //             setWorldPos(masses[i], distVec*safeDist+ball->center);
+    //             masses[i]->velocity = masses[i]->velocity*ball->friction;
+    //         }
+    //     }
+	// }
 };
