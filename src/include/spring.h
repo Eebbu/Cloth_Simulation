@@ -1,6 +1,6 @@
 #pragma once
 
-#include "points.h"
+#include "mass.h"
 
 using namespace std;
 
