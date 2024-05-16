@@ -98,6 +98,7 @@ int main(int argc, const char * argv[]) {
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
         for (int i = 0; i < 25; i ++) {
             cloth.step(&ball, TIME_STEP);
+            // cloth.rk4_step(&ball, TIME_STEP);
         }
         cloth.compute_normal();
         
