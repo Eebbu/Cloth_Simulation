@@ -10,14 +10,8 @@ public:
     Mass* mass2;
 	double rest_len;
     double spring_constant;
-    double dampCoef;
     
-	Spring(Mass* m1, Mass* m2, double k) {
-        mass1 = m1;
-        mass2 = m2;
-		
+	Spring(Mass* m1, Mass* m2, double k): mass1(m1), mass2(m2), spring_constant(k) {
         rest_len = glm::length(mass2->position - mass1->position);
-        spring_constant = k;
-        dampCoef = 5.0;
 	}
 };

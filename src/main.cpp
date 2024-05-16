@@ -99,7 +99,7 @@ int main(int argc, const char * argv[]) {
         for (int i = 0; i < 25; i ++) {
             cloth.step(&ball, TIME_STEP);
         }
-        cloth.computeNormal();
+        cloth.compute_normal();
         
         /** Display **/
         if (cloth.draw_texture) {
