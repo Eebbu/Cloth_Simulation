@@ -8,8 +8,6 @@
 class Cloth {
 public:
     const int         mass_density    = 4;
-    const int         width           = 10;
-    const int         height          = 10;
     const int         mass_per_row    = 40;
     const int         mass_per_col    = 40;
     const double      structural_coef = 300.0;
@@ -19,7 +17,7 @@ public:
     const glm::dvec3  gravity         = glm::dvec3(0.0, -1.0, 0.0);
     const glm::vec3   cloth_pos       = glm::vec3(-5, 16, 0);
     const bool        draw_texture    = false;
-    const int constraints_iterations  = 10;
+    const int constraints_iterations  = 6;
     
     std::vector<Mass*>   masses;
 	std::vector<Spring*> springs;
@@ -112,41 +110,34 @@ public:
         }
 	}
 
-    void compute_spring_forces() {
+    void compute_forces() {
+        for (auto &mass : this->masses) {
+            mass->force = glm::dvec3(0.0);
+        }
+
         for (auto &spring: this->springs) {
             glm::dvec3 spring_vec = spring->mass1->position - spring->mass2->position;
             double spring_length = glm::length(spring_vec);
 
-            glm::dvec3 damp_force = damp_coef * (spring->mass1->position - spring->mass2->position);
-            glm::dvec3 force = spring_vec * spring->spring_constant  / spring_length * (spring_length - spring->rest_len);
-            spring->mass1->force += -force - damp_force;
-            spring->mass2->force += force + damp_force;
+            glm::dvec3 elastic_force = spring_vec * spring->spring_constant  / spring_length * (spring_length - spring->rest_len);
+            spring->mass1->force += -elastic_force;
+            spring->mass2->force += elastic_force;
         }
-    }
 
-    void apply_gravity() {
         for (auto &mass : this->masses) {
             if (!mass->is_fixed) {
+                mass->force += -mass->velocity * this->damp_coef;
                 mass->force += gravity * mass->m;
             }
         }
     }
 
     void step(Ball* ball, double delta_t) {
-        // remeber set damp_coef to 0.65
-        for (auto &spring: this->springs) {
-            glm::dvec3 spring_vec = spring->mass1->position - spring->mass2->position;
-            double spring_length = glm::length(spring_vec);
-
-            glm::dvec3 force = spring_vec * spring->spring_constant  / spring_length * (spring_length - spring->rest_len);
-            spring->mass1->force += -force;
-            spring->mass2->force += force;
-        }
+        compute_forces();
 
         for (auto &mass : this->masses) {
             if (!mass->is_fixed) {
                 mass->last_position = mass->position;
-                mass->force += gravity * mass->m - mass->velocity * this->damp_coef;
                 mass->velocity += mass->force/mass->m*delta_t;
                 mass->position += mass->velocity*delta_t;
             }
@@ -158,8 +149,12 @@ public:
        //  collisionResponse(ball);
     }
 
+    
+
+    /**
+     * Runge Kutta
+     */
     void rk4_step(Ball* ball, double delta_t) {
-        // remeber set damp_coef to 200
         std::vector<glm::dvec3> initial_positions;
         std::vector<glm::dvec3> initial_velocities;
         std::vector<glm::dvec3> k1_positions;
@@ -186,8 +181,7 @@ public:
         }
 
         // k1
-        compute_spring_forces();
-        apply_gravity();
+        compute_forces();
         for (size_t i = 0; i < masses.size(); ++i) {
             if (!masses[i]->is_fixed) {
                 k1_positions[i] = masses[i]->velocity * delta_t;
@@ -202,8 +196,7 @@ public:
                 masses[i]->velocity = initial_velocities[i] + 0.5 * k1_velocities[i];
             }
         }
-        compute_spring_forces();
-        apply_gravity();
+        compute_forces();
         for (size_t i = 0; i < masses.size(); ++i) {
             if (!masses[i]->is_fixed) {
                 k2_positions[i] = masses[i]->velocity * delta_t;
@@ -218,8 +211,7 @@ public:
                 masses[i]->velocity = initial_velocities[i] + 0.5 * k2_velocities[i];
             }
         }
-        compute_spring_forces();
-        apply_gravity();
+        compute_forces();
         for (size_t i = 0; i < masses.size(); ++i) {
             if (!masses[i]->is_fixed) {
                 k3_positions[i] = masses[i]->velocity * delta_t;
@@ -234,8 +226,7 @@ public:
                 masses[i]->velocity = initial_velocities[i] + k3_velocities[i];
             }
         }
-        compute_spring_forces();
-        apply_gravity();
+        compute_forces();
         for (size_t i = 0; i < masses.size(); ++i) {
             if (!masses[i]->is_fixed) {
                 k4_positions[i] = masses[i]->velocity * delta_t;
