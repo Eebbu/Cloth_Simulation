@@ -509,3 +509,14 @@ struct BallRender {
     
     void flush() { render.flush(); }
 };
+struct CubeRender {
+    Cube* cube;
+    RigidRender render;
+    
+    CubeRender(Cube* c) {
+        cube = c;
+        render.init(cube->faces, cube->color, glm::vec3(0, 0, 0));
+    }
+    
+    void flush() { render.flush(); }
+};
