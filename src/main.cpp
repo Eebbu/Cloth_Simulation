@@ -19,6 +19,7 @@
 #define HEIGHT 800
 #define AIR_FRICTION 0.02
 #define TIME_STEP 0.01
+#define WINDBLOWINGRADIUS 100
 
 /** Callback functions **/
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -148,12 +149,51 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
-void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
+void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos)
+{
+
+    if (!windBlowing)
+    {
+        return;
+    }
+
     /** Wind **/
-    if (windBlowing) {
-        windDir = glm::dvec3(xpos, -ypos, 0) - windStartPos;
-        windDir = glm::normalize(windDir);
-        wind = windDir * windForceScale;
-        cloth.add_force(wind);
+
+    windDir = glm::dvec3(xpos, -ypos, 0) - windStartPos;
+    windDir = glm::normalize(windDir);
+    wind = windDir * windForceScale;
+
+    glm::dvec3 clothPos = cloth.cloth_pos;
+    glm::dvec2 mousePosition = glm::dvec2(xpos, ypos);
+
+    glm::mat4 viewMatrix = cam.uniViewMatrix;
+    glm::mat4 projectionMatrix = cam.uniProjMatrix;
+
+    for (int i = 0; i < cloth.masses.size(); i++)
+    {
+        glm::dvec3 massLocalPosition = cloth.masses[i]->last_position;
+
+        //质点转换到世界坐标
+        glm::dvec3 massPosition = glm::dvec3(clothPos.x + massLocalPosition.x,
+                                             clothPos.y + massLocalPosition.y,
+                                             clothPos.z + massLocalPosition.z);
+
+        //将质点的世界坐标通过裁切空间以及ndc空间转换到屏幕空间
+        glm::vec4 clipSpacePos = projectionMatrix * viewMatrix * glm::vec4(massPosition, 1.0);
+        glm::vec3 ndcSpacePos = glm::vec3(clipSpacePos) / clipSpacePos.w;
+
+        glm::dvec2 screenPos = glm::dvec2((ndcSpacePos.x + 1.0) / 2.0 * WIDTH,
+                                          (1.0 - ndcSpacePos.y) / 2.0 * HEIGHT);
+
+        //计算质点和鼠标位置的距离
+        glm::dvec2 massToMouse = screenPos - mousePosition;
+
+        double distance = glm::length(massToMouse);
+
+        //判断距离是否在wind blowing的half radius之内，如果在的话，则将对应质点的力增加
+        if (distance <= WINDBLOWINGRADIUS)
+        {
+            cloth.masses[i]->force += wind;
+        }
     }
 }
