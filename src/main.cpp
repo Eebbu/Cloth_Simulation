@@ -20,10 +20,13 @@
 #define AIR_FRICTION 0.02
 #define TIME_STEP 0.01
 
+using namespace std;
 /** Callback functions **/
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 void cursor_pos_callback(GLFWwindow *window, double xpos, double ypos);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
 
 /** Global **/
 // Wind
@@ -42,6 +45,10 @@ glm::dvec3 bgColor = glm::dvec3(0.0/255, 0.0/255, 0.0/255);
 
 
 int main(int argc, const char * argv[]) {
+    string method = "Euler";  //default method is Euler
+    if (argc > 1) {
+        method = argv[1];
+    }
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -73,7 +80,8 @@ int main(int argc, const char * argv[]) {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetCursorPosCallback(window, cursor_pos_callback);
-    
+    glfwSetKeyCallback(window, key_callback);
+
     /** Renderers **/
     ClothRender clothRender(&cloth);
     ClothSpringRender clothSpringRender(&cloth);
@@ -94,8 +102,11 @@ int main(int argc, const char * argv[]) {
         
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
         for (int i = 0; i < 25; i ++) {
-            cloth.step(&ball, TIME_STEP);
-            // cloth.rk4_step(&ball, TIME_STEP);
+            if (method == "RK") {
+                cloth.rk4_step(&ball, TIME_STEP);
+            }else{
+                cloth.step(&ball, TIME_STEP);
+            }
         }
         cloth.adaptive_refinement();
         cloth.compute_normal();
@@ -145,5 +156,20 @@ void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
         windDir = glm::normalize(windDir);
         wind = windDir * windForceScale;
         cloth.add_force(wind);
+    }
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    //reset the simulation when press R
+    if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+
+        cloth.reset();
+        //TODO : reset other..
+        cout << "----------Simulation reset-----------" << endl;
+    }
+
+    //close windoow when press Esc
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GL_TRUE);
     }
 }
