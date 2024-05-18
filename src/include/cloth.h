@@ -7,8 +7,8 @@
 
 class Cloth {
 public:
-    const int         mass_per_row    = 20;
-    const int         mass_per_col    = 20;
+    const int         mass_per_row    = 30;
+    const int         mass_per_col    = 30;
     const double      mass_density    = (double)mass_per_row/14.0;
     const double      structural_coef = 300.0;
     const double      shear_coef      = 200.0;
@@ -289,6 +289,10 @@ public:
         for (int i = 0; i< this->constraints_iterations; i++) {
             bool normal = true;
             for (auto &spring : springs) {
+                //skip the flexion spring(almost not limited in real cloth)
+                if(spring->spring_type == Spring::FLEXION){
+                    continue;
+                }
                 double current_length = spring->get_length();
                 if (current_length <= spring->max_len) {
                     continue;
@@ -384,6 +388,47 @@ public:
             masses[i]->force += f;
         }
     }
+
+    void reset() {
+        // for (auto& mass : masses) {
+        //         delete mass;
+        //     }
+        //     masses.clear();
+
+        //     for (auto& spring : springs) {
+        //         delete spring;
+        //     }
+        //     springs.clear();
+
+        // initialize_masses();
+        // link_springs();
+        // initialize_face();
+        // fixed_mass(get_mass(0, 0), glm::dvec3(1.0, 0.0, 0.0));
+        // fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-1.0, 0.0, 0.0));
+
+        // 重置所有质点的位置、速度和力
+        for (int i = 0; i < mass_per_row; i++) {
+            for (int j = 0; j < mass_per_col; j++) {
+                glm::dvec3 initial_position = glm::dvec3((double)i / mass_density, 0, (double)j / mass_density);
+                Mass* mass = get_mass(i, j);
+                mass->position = initial_position;
+                mass->velocity = glm::dvec3(0.0, 0.0, 0.0);
+                mass->force = glm::dvec3(0.0, 0.0, 0.0);
+            }
+        }
+
+        // 重新链接弹簧，重置所有连接和弹性特性
+        springs.clear(); // 清除旧的弹簧连接
+        link_springs();  // 重新创建弹簧连接
+        initialize_face();  // 重建面信息
+
+        // 重置固定质点
+        fixed_mass(get_mass(0, 0), glm::dvec3(1.0, 0.0, 0.0));
+        fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-1.0, 0.0, 0.0));
+
+        // 重新计算法线
+        compute_normal();
+}
 	
     // Vec3 getWorldPos(Mass* n) { 
     //     return cloth_pos + n->position; 
