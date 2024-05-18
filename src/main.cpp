@@ -110,7 +110,7 @@ int main(int argc, const char * argv[]) {
         }
         cloth.adaptive_refinement();
         cloth.compute_normal();
-        
+
         /** Display **/
         if (cloth.draw_texture) {
             clothRender.flush();
@@ -168,8 +168,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         cout << "----------Simulation reset-----------" << endl;
     }
 
+    //texture
+    if (key == GLFW_KEY_T && action == GLFW_PRESS) {
+        cloth.draw_texture = (1 - cloth.draw_texture);
+    }
+
     //close windoow when press Esc
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
+
+
 }

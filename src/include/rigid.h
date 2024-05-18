@@ -140,7 +140,7 @@ struct Ball {
     const int        radius   = 1;
     const double     friction = 0.8;
     const glm::vec3  center   = glm::vec3(0, 6, 0);
-    const glm::vec4  color    = glm::vec4(0.6f, 0.5f, 0.8f, 1.0f);
+    const glm::vec4  color    = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     
     
     Sphere* sphere;
