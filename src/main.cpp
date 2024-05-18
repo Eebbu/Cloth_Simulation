@@ -85,11 +85,8 @@ int main(int argc, const char * argv[]) {
     glEnable(GL_DEPTH_TEST);
     glPointSize(3);
     
-    bool a = true;
     /** Redering loop **/
     while (!glfwWindowShouldClose(window)) {
-        auto start = std::chrono::high_resolution_clock::now();
-
         /** Set background clolor **/
         glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.0); // Set color value (R,G,B,A) - Set Status
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -100,6 +97,7 @@ int main(int argc, const char * argv[]) {
             cloth.step(&ball, TIME_STEP);
             // cloth.rk4_step(&ball, TIME_STEP);
         }
+        cloth.adaptive_refinement();
         cloth.compute_normal();
         
         /** Display **/
@@ -115,14 +113,6 @@ int main(int argc, const char * argv[]) {
         
         glfwSwapBuffers(window);
         glfwPollEvents(); // Update the status of window
-
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-        int remaining_time = 1000000 / 60 - duration.count();
-        if (remaining_time > 0) {
-            std::this_thread::sleep_for(std::chrono::microseconds(remaining_time));
-        }
     }
 
     glfwTerminate();
