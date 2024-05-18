@@ -7,17 +7,19 @@
 
 class Cloth {
 public:
-    const int         mass_density    = 4;
-    const int         mass_per_row    = 40;
-    const int         mass_per_col    = 40;
+    const int         mass_per_row    = 20;
+    const int         mass_per_col    = 20;
+    const double      mass_density    = (double)mass_per_row/14.0;
     const double      structural_coef = 300.0;
     const double      shear_coef      = 200.0;
     const double      bending_coef    = 200.0;
     const double      damp_coef       = 0.65;
     const glm::dvec3  gravity         = glm::dvec3(0.0, -1.0, 0.0);
-    const glm::vec3   cloth_pos       = glm::vec3(-5, 16, 0);
+    const glm::vec3   cloth_pos       = glm::vec3(-7, 18, -6);
     const bool        draw_texture    = false;
+    const double      refine_angle    = std::cos(glm::radians(135.0f));
     const int constraints_iterations  = 6;
+    const int refine_iterations       = 3;
     
     std::vector<Mass*>   masses;
 	std::vector<Spring*> springs;
@@ -71,24 +73,59 @@ public:
             for (int j = 0; j < mass_per_col; j ++) {
                 // structural springs
                 if (i < mass_per_row-1) {
-                    springs.push_back(new Spring(get_mass(i, j), get_mass(i+1, j), structural_coef));
+                    Mass* mass1 = get_mass(i, j);
+                    Mass* mass2 = get_mass(i+1, j);
+                    Spring* spring = new Spring(mass1, mass2, structural_coef, Spring::STRUCTURAL);
+                    
+                    springs.push_back(spring);
+                    mass1->link_springs(Mass::STRUCTURAL_ROW, spring);
+                    mass2->link_springs(Mass::STRUCTURAL_ROW, spring);
                 }
                 if (j < mass_per_col-1) {
-                    springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+1), structural_coef));
+                    Mass* mass1 = get_mass(i, j);
+                    Mass* mass2 = get_mass(i, j+1);
+                    Spring* spring = new Spring(mass1, mass2, structural_coef, Spring::STRUCTURAL);
+
+                    springs.push_back(spring);
+                    mass1->link_springs(Mass::STRUCTURAL_COLUMN, spring);
+                    mass2->link_springs(Mass::STRUCTURAL_COLUMN, spring);
                 }
                 
                 // shear springs
                 if (i < mass_per_row-1 && j < mass_per_col-1) {
-                    springs.push_back(new Spring(get_mass(i, j), get_mass(i+1, j+1), shear_coef));
-                    springs.push_back(new Spring(get_mass(i+1, j), get_mass(i, j+1), shear_coef));
+                    Mass* mass1 = get_mass(i, j);
+                    Mass* mass2 = get_mass(i+1, j+1);
+                    Mass* mass3 = get_mass(i+1, j);
+                    Mass* mass4 = get_mass(i, j+1);
+                    Spring* spring1 = new Spring(mass1, mass2, shear_coef, Spring::SHEAR);
+                    Spring* spring2 = new Spring(mass3, mass4, shear_coef, Spring::SHEAR);
+
+                    springs.push_back(spring1);
+                    springs.push_back(spring2);
+                    mass1->link_springs(Mass::SHEAR_LEFT_TO_RIGHT, spring1);
+                    mass2->link_springs(Mass::SHEAR_LEFT_TO_RIGHT, spring1);
+                    mass3->link_springs(Mass::SHEAR_RIGHT_TO_LEFT, spring2);
+                    mass4->link_springs(Mass::SHEAR_RIGHT_TO_LEFT, spring2);
                 }
                 
                 // flexion springs
                 if (i < mass_per_row-2) {
-                    springs.push_back(new Spring(get_mass(i, j), get_mass(i+2, j), bending_coef));
+                    Mass* mass1 = get_mass(i, j);
+                    Mass* mass2 = get_mass(i+2, j);
+                    Spring* spring = new Spring(mass1, mass2, bending_coef, Spring::FLEXION);
+
+                    springs.push_back(spring);
+                    mass1->link_springs(Mass::FLEXION_ROW, spring);
+                    mass2->link_springs(Mass::FLEXION_ROW, spring);
                 }
                 if (j < mass_per_col-2) {
-                    springs.push_back(new Spring(get_mass(i, j), get_mass(i, j+2), bending_coef));
+                    Mass* mass1 = get_mass(i, j);
+                    Mass* mass2 = get_mass(i, j+2);
+                    Spring* spring = new Spring(mass1, mass2, bending_coef, Spring::FLEXION);
+                    
+                    springs.push_back(spring);
+                    mass1->link_springs(Mass::FLEXION_COLUMN, spring);
+                    mass2->link_springs(Mass::FLEXION_COLUMN, spring);
                 }
             }
         }
@@ -283,6 +320,48 @@ public:
     void update_velocity_after_constraints(double delta_t) {
         for(auto &mass: masses) {
             mass->velocity = (mass->position - mass->last_position) / delta_t;
+        }
+    }
+
+    bool detect_refinement(Mass* mass, Spring* spring1, Spring* spring2) {
+        glm::dvec3 vec1 = spring1->mass1 == mass 
+                ? spring1->mass1->position - spring1->mass2->position 
+                : spring1->mass2->position - spring1->mass1->position;
+        
+        glm::dvec3 vec2 = spring2->mass1 == mass 
+                ? spring2->mass1->position - spring2->mass2->position 
+                : spring2->mass2->position - spring2->mass1->position;
+
+        double vecCos = glm::dot(vec1, vec2) / (glm::length(vec1) * glm::length(vec2));
+        
+        return vecCos > refine_angle;
+    }
+
+    void do_adaptive_refinement(Mass* mass, Spring* spring1, Spring* spring2) {
+
+    }
+
+
+    void adaptive_refinement() {
+        for (int i = 0; i < refine_iterations; i++) {
+            bool refine = false;
+            for(auto &mass : this->masses) {
+                // only structral
+                std::vector<Spring*> mass_springs = mass->springs_map[Mass::STRUCTURAL_ROW];
+                if ( mass_springs.size() == 2 && detect_refinement(mass, mass_springs[0], mass_springs[1])) {
+                    do_adaptive_refinement(mass, mass_springs[0], mass_springs[1]);
+                    refine = true;
+                }
+
+                mass_springs = mass->springs_map[Mass::STRUCTURAL_COLUMN];
+                if ( mass_springs.size() == 2 && detect_refinement(mass, mass_springs[0], mass_springs[1])) {
+                    do_adaptive_refinement(mass, mass_springs[0], mass_springs[1]);
+                    refine = true;
+                }
+            }
+            if (!refine) {
+                return;
+            }
         }
     }
 
