@@ -15,11 +15,13 @@ public:
     const double      bending_coef    = 200.0;
     const double      damp_coef       = 0.65;
     const glm::dvec3  gravity         = glm::dvec3(0.0, -1.0, 0.0);
-    const glm::vec3   cloth_pos       = glm::vec3(-7, 18, -6);
-    const bool        draw_texture    = false;
+    const glm::vec3  cloth_pos        = glm::vec3(-7.0, 18.0, -6.0);
+    bool              draw_texture    = false;
     const double      refine_angle    = std::cos(glm::radians(135.0f));
     const int constraints_iterations  = 6;
     const int refine_iterations       = 3;
+    const double       visco_coef     = 0.5f;  // Viscosity coefficient
+    const glm::dvec3   u_fluid        = glm::dvec3(0.0, 0.0, 0.0);  // Assume fluid = 0 with no wind
     
     std::vector<Mass*>   masses;
 	std::vector<Spring*> springs;
@@ -30,8 +32,8 @@ public:
         link_springs();
         initialize_face();
 
-        fixed_mass(get_mass(0, 0), glm::dvec3(1.0, 0.0, 0.0));
-        fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-1.0, 0.0, 0.0));
+        fixed_mass(get_mass(0, 0), glm::dvec3(0.1, 0.0, 0.0));
+        fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-0.1, 0.0, 0.0));
 	}
 
 	~Cloth() {
@@ -163,9 +165,16 @@ public:
 
         for (auto &mass : this->masses) {
             if (!mass->is_fixed) {
+                //damping force
                 mass->force += -mass->velocity * this->damp_coef;
+                //gravity
                 mass->force += gravity * mass->m;
-            }
+                //velo
+                glm::dvec3 relative_velocity = u_fluid - mass->velocity;
+                double velocity_normal_component = glm::dot(mass->normal, relative_velocity);
+                glm::dvec3 fluid_force = visco_coef * velocity_normal_component * mass->normal;
+                mass->force += fluid_force;
+            }        
         }
     }
 
@@ -183,7 +192,7 @@ public:
 
         solve_constraints(0);
         update_velocity_after_constraints(delta_t);
-       //  collisionResponse(ball);
+        collisionResponse(ball);
     }
 
     
@@ -282,7 +291,7 @@ public:
 
         solve_constraints(0);
         update_velocity_after_constraints(delta_t);
-       //  collisionResponse(ball);
+        collisionResponse(ball);
     }
 
     void solve_constraints(int iterations) {
@@ -390,23 +399,7 @@ public:
     }
 
     void reset() {
-        // for (auto& mass : masses) {
-        //         delete mass;
-        //     }
-        //     masses.clear();
-
-        //     for (auto& spring : springs) {
-        //         delete spring;
-        //     }
-        //     springs.clear();
-
-        // initialize_masses();
-        // link_springs();
-        // initialize_face();
-        // fixed_mass(get_mass(0, 0), glm::dvec3(1.0, 0.0, 0.0));
-        // fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-1.0, 0.0, 0.0));
-
-        // 重置所有质点的位置、速度和力
+        //reset masses
         for (int i = 0; i < mass_per_row; i++) {
             for (int j = 0; j < mass_per_col; j++) {
                 glm::dvec3 initial_position = glm::dvec3((double)i / mass_density, 0, (double)j / mass_density);
@@ -417,38 +410,65 @@ public:
             }
         }
 
-        // 重新链接弹簧，重置所有连接和弹性特性
-        springs.clear(); // 清除旧的弹簧连接
-        link_springs();  // 重新创建弹簧连接
-        initialize_face();  // 重建面信息
+        //reconnect spring
+        springs.clear();
+        link_springs();
+        //reset face
+        initialize_face();
 
-        // 重置固定质点
+        //pin mass
         fixed_mass(get_mass(0, 0), glm::dvec3(1.0, 0.0, 0.0));
         fixed_mass(get_mass(mass_per_row-1, 0), glm::dvec3(-1.0, 0.0, 0.0));
 
-        // 重新计算法线
+        //recompute normal
         compute_normal();
 }
 	
-    // Vec3 getWorldPos(Mass* n) { 
-    //     return cloth_pos + n->position; 
-    // }
+    glm::vec3 getWorldPos(Mass* m) { 
+        return cloth_pos + glm::vec3(m->position); 
+    }
 
-    // void setWorldPos(Mass* n, Vec3 pos) { 
-    //     n->position = pos - cloth_pos; 
-    // }
+    void setWorldPos(Mass* m, glm::vec3 pos) { 
+        m->position = pos - cloth_pos; 
+    }
     
 	// void collisionResponse(Ball* ball) {
     //     for (int i = 0; i < masses.size(); i++) {   
     //         /** Ball collision **/
-    //         Vec3 distVec = getWorldPos(masses[i]) - ball->center;
-    //         double distLen = distVec.length();
-    //         double safeDist = ball->radius*1.05;
+    //         glm::vec3 distVec = getWorldPos(masses[i]) - ball->center;
+    //         float distLen = distVec.length();
+    //         float safeDist = ball->radius*1.05;
     //         if (distLen < safeDist) {
-    //             distVec.normalize();
-    //             setWorldPos(masses[i], distVec*safeDist+ball->center);
+    //             distVec = glm::normalize(distVec);
+    //             setWorldPos(masses[i], distVec*safeDist + ball->center);
     //             masses[i]->velocity = masses[i]->velocity*ball->friction;
     //         }
     //     }
 	// }
+    void collisionResponse(Ball* ball) {
+    for (auto& mass : masses) {   
+        glm::vec3 distVec = getWorldPos(mass) - ball->center;
+        float dist = glm::length(distVec);
+        float penetration = ball->radius - dist;
+        
+        if (dist < ball->radius) {
+            glm::vec3 normal = glm::normalize(distVec);
+            int r = ball->radius;
+            glm::vec3 contactPoint = ball->center + normal * (float)r;
+            
+            // Reposition the mass
+            setWorldPos(mass, contactPoint);
+
+            // Reflect velocity
+            glm::vec3 incomingVelocity = mass->velocity;
+            float velocityAlongNormal = glm::dot(incomingVelocity, normal);
+
+            if (velocityAlongNormal < 0) {
+                glm::vec3 reflectedVelocity = incomingVelocity - 2 * velocityAlongNormal * normal;
+                mass->velocity = reflectedVelocity * (float)ball->friction;
+            }
+        }
+    }
+}
+
 };
