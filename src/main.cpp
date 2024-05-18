@@ -37,8 +37,14 @@ glm::dvec3 windDir;
 glm::dvec3 wind;
 Cloth cloth;
 
-// Ball
+
+// Ball&Cube
 Ball ball;
+Cube cube;
+RigidType currentRigidType = RigidType::Cube;  // Default to ball
+//Boolean show ball or cube
+bool showBall = false;
+bool showCube = true;
 // Window and world
 GLFWwindow *window;
 glm::dvec3 bgColor = glm::dvec3(0.0/255, 0.0/255, 0.0/255);
@@ -86,7 +92,7 @@ int main(int argc, const char * argv[]) {
     ClothRender clothRender(&cloth);
     ClothSpringRender clothSpringRender(&cloth);
     BallRender ballRender(&ball);
-    
+    CubeRender cubeRender(&cube);
     // Vec3 initForce(10.0, 40.0, 20.0);
     // cloth.addForce(initForce);
     
@@ -103,9 +109,9 @@ int main(int argc, const char * argv[]) {
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
         for (int i = 0; i < 25; i ++) {
             if (method == "RK") {
-                cloth.rk4_step(&ball, TIME_STEP);
+                cloth.rk4_step(currentRigidType,currentRigidType == RigidType::Ball ? static_cast<void*>(&ball) : static_cast<void*>(&cube),TIME_STEP);
             }else{
-                cloth.step(&ball, TIME_STEP);
+                cloth.step(currentRigidType,currentRigidType == RigidType::Ball ? static_cast<void*>(&ball) : static_cast<void*>(&cube),TIME_STEP);
             }
         }
         cloth.adaptive_refinement();
@@ -117,8 +123,14 @@ int main(int argc, const char * argv[]) {
         } else {
             clothSpringRender.flush();
         }
-        ballRender.flush();
+        //control ball & cube rendering
+        if (showCube) {
+            cubeRender.flush();
+        }
         
+        if (showBall) {
+            ballRender.flush();
+        }
         
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
         
@@ -171,6 +183,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     //texture
     if (key == GLFW_KEY_T && action == GLFW_PRESS) {
         cloth.draw_texture = (1 - cloth.draw_texture);
+    }
+
+    //show cube when press C
+    if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+        showCube = true;
+        showBall = false;
+        currentRigidType = RigidType::Cube;
+        cout << "----------Show Cube-----------" << endl;
+    }
+
+    //show ball when press B
+    if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+        showBall = true;
+        showCube = false;
+        currentRigidType = RigidType::Ball;
+        cout << "----------Show Ball-----------" << endl;
     }
 
     //close windoow when press Esc
