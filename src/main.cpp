@@ -55,13 +55,7 @@ glm::dvec3 bgColor = glm::dvec3(0.0/255, 0.0/255, 0.0/255);
 
 
 int main(int argc, const char * argv[]) {
-    string method = "Euler";  //default method is Euler
-    if (argc > 1 ) {
-        string input_string = argv[1];
-        if(input_string == "RK"){
-            method = argv[1];
-        }
-    }
+    string method = argc > 1 ? argv[1] : "Euler";  //default method is Euler
     cout << method << endl;
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -127,7 +121,9 @@ int main(int argc, const char * argv[]) {
         for (int i = 0; i < 25; i ++) {
             if (method == "RK") {
                 cloth.rk4_step(constraint, currentRigidType, obj, TIME_STEP);
-            }else{
+            } else if (method == "VERLET") {
+                cloth.explicit_verlet(constraint, currentRigidType, obj, TIME_STEP);
+            } else {
                 cloth.step(constraint, currentRigidType, obj, TIME_STEP);
             }
         }
