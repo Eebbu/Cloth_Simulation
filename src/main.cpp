@@ -56,21 +56,13 @@ glm::dvec3 bgColor = glm::dvec3(0.0/255, 0.0/255, 0.0/255);
 
 int main(int argc, const char * argv[]) {
     string method = "Euler";  //default method is Euler
-    if (argc > 2) {
-        method = argv[1];
-        string cons = argv[2];
-        if(cons == "no"){
-            constraint = false;
-        }
-    }else if (argc > 1) {
+    if (argc > 1 ) {
         string input_string = argv[1];
         if(input_string == "RK"){
             method = argv[1];
-        }else if(input_string == "no"){
-            constraint = false;
         }
     }
-    cout << constraint << endl;
+    cout << method << endl;
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -225,12 +217,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         currentRigidType = RigidType::Ball;
         cout << "----------Show Ball-----------" << endl;
     }
-        //show only cloth when press d
+    //show only cloth when press d
     if (key == GLFW_KEY_D && action == GLFW_PRESS) {
         showBall = false;
         showCube = false;
         currentRigidType = RigidType::Empty;
         cout << "----------Show Cloth-----------" << endl;
+    }
+    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+        constraint = (1 - constraint);
+        cout << "----------Add constraint-----------" << endl;
     }
 
     //close windoow when press Esc
