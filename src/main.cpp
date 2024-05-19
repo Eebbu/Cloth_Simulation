@@ -131,7 +131,6 @@ int main(int argc, const char * argv[]) {
                 cloth.step(constraint, currentRigidType, obj, TIME_STEP);
             }
         }
-        cloth.adaptive_refinement();
         cloth.compute_normal();
 
         /** Display **/

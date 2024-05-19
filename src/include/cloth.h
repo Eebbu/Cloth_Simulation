@@ -14,7 +14,7 @@ public:
     const double mass_density = (double)mass_per_row / 14.0;
     const double structural_coef = 300.0;
     const double shear_coef = 200.0;
-    const double bending_coef = 200.0;
+    const double flexion_coef = 200.0;
     const double damp_coef = 0.65;
     const glm::dvec3 gravity = glm::dvec3(0.0, -1.0, 0.0);
     const glm::vec3 cloth_pos = glm::vec3(-7.0, 18.0, -6.0);
@@ -87,66 +87,32 @@ public:
         {
             for (int j = 0; j < mass_per_col; j++)
             {
+                Mass* mass = get_mass(i, j);
                 // structural springs
                 if (i < mass_per_row - 1)
                 {
-                    Mass *mass1 = get_mass(i, j);
-                    Mass *mass2 = get_mass(i + 1, j);
-                    Spring *spring = new Spring(mass1, mass2, structural_coef, Spring::STRUCTURAL);
-
-                    springs.push_back(spring);
-                    mass1->link_springs(Mass::STRUCTURAL_ROW, spring);
-                    mass2->link_springs(Mass::STRUCTURAL_ROW, spring);
+                    springs.push_back(new Spring(mass, get_mass(i + 1, j), structural_coef, Spring::STRUCTURAL));
                 }
                 if (j < mass_per_col - 1)
                 {
-                    Mass *mass1 = get_mass(i, j);
-                    Mass *mass2 = get_mass(i, j + 1);
-                    Spring *spring = new Spring(mass1, mass2, structural_coef, Spring::STRUCTURAL);
-
-                    springs.push_back(spring);
-                    mass1->link_springs(Mass::STRUCTURAL_COLUMN, spring);
-                    mass2->link_springs(Mass::STRUCTURAL_COLUMN, spring);
+                    springs.push_back(new Spring(mass, get_mass(i, j + 1), structural_coef, Spring::STRUCTURAL));
                 }
 
                 // shear springs
                 if (i < mass_per_row - 1 && j < mass_per_col - 1)
                 {
-                    Mass *mass1 = get_mass(i, j);
-                    Mass *mass2 = get_mass(i + 1, j + 1);
-                    Mass *mass3 = get_mass(i + 1, j);
-                    Mass *mass4 = get_mass(i, j + 1);
-                    Spring *spring1 = new Spring(mass1, mass2, shear_coef, Spring::SHEAR);
-                    Spring *spring2 = new Spring(mass3, mass4, shear_coef, Spring::SHEAR);
-
-                    springs.push_back(spring1);
-                    springs.push_back(spring2);
-                    mass1->link_springs(Mass::SHEAR_LEFT_TO_RIGHT, spring1);
-                    mass2->link_springs(Mass::SHEAR_LEFT_TO_RIGHT, spring1);
-                    mass3->link_springs(Mass::SHEAR_RIGHT_TO_LEFT, spring2);
-                    mass4->link_springs(Mass::SHEAR_RIGHT_TO_LEFT, spring2);
+                    springs.push_back(new Spring(mass, get_mass(i + 1, j + 1), structural_coef, Spring::SHEAR));
+                    springs.push_back(new Spring(get_mass(i + 1, j), get_mass(i, j + 1), structural_coef, Spring::SHEAR));
                 }
 
                 // flexion springs
                 if (i < mass_per_row - 2)
                 {
-                    Mass *mass1 = get_mass(i, j);
-                    Mass *mass2 = get_mass(i + 2, j);
-                    Spring *spring = new Spring(mass1, mass2, bending_coef, Spring::FLEXION);
-
-                    springs.push_back(spring);
-                    mass1->link_springs(Mass::FLEXION_ROW, spring);
-                    mass2->link_springs(Mass::FLEXION_ROW, spring);
+                    springs.push_back(new Spring(mass, get_mass(i + 2, j), flexion_coef, Spring::FLEXION));
                 }
                 if (j < mass_per_col - 2)
                 {
-                    Mass *mass1 = get_mass(i, j);
-                    Mass *mass2 = get_mass(i, j + 2);
-                    Spring *spring = new Spring(mass1, mass2, bending_coef, Spring::FLEXION);
-
-                    springs.push_back(spring);
-                    mass1->link_springs(Mass::FLEXION_COLUMN, spring);
-                    mass2->link_springs(Mass::FLEXION_COLUMN, spring);
+                    springs.push_back(new Spring(mass, get_mass(i, j + 2), flexion_coef, Spring::FLEXION));
                 }
             }
         }
@@ -393,54 +359,6 @@ public:
         for (auto &mass : masses)
         {
             mass->velocity = (mass->position - mass->last_position) / delta_t;
-        }
-    }
-
-    bool detect_refinement(Mass *mass, Spring *spring1, Spring *spring2)
-    {
-        glm::dvec3 vec1 = spring1->mass1 == mass
-                              ? spring1->mass1->position - spring1->mass2->position
-                              : spring1->mass2->position - spring1->mass1->position;
-
-        glm::dvec3 vec2 = spring2->mass1 == mass
-                              ? spring2->mass1->position - spring2->mass2->position
-                              : spring2->mass2->position - spring2->mass1->position;
-
-        double vecCos = glm::dot(vec1, vec2) / (glm::length(vec1) * glm::length(vec2));
-
-        return vecCos > refine_angle;
-    }
-
-    void do_adaptive_refinement(Mass *mass, Spring *spring1, Spring *spring2)
-    {
-    }
-
-    void adaptive_refinement()
-    {
-        for (int i = 0; i < refine_iterations; i++)
-        {
-            bool refine = false;
-            for (auto &mass : this->masses)
-            {
-                // only structral
-                std::vector<Spring *> mass_springs = mass->springs_map[Mass::STRUCTURAL_ROW];
-                if (mass_springs.size() == 2 && detect_refinement(mass, mass_springs[0], mass_springs[1]))
-                {
-                    do_adaptive_refinement(mass, mass_springs[0], mass_springs[1]);
-                    refine = true;
-                }
-
-                mass_springs = mass->springs_map[Mass::STRUCTURAL_COLUMN];
-                if (mass_springs.size() == 2 && detect_refinement(mass, mass_springs[0], mass_springs[1]))
-                {
-                    do_adaptive_refinement(mass, mass_springs[0], mass_springs[1]);
-                    refine = true;
-                }
-            }
-            if (!refine)
-            {
-                return;
-            }
         }
     }
 
