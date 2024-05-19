@@ -508,6 +508,8 @@ public:
     {
         switch (type)
         {
+        case RigidType::Empty:
+            break;
         case RigidType::Ball:
             collisionResponse(static_cast<Ball *>(object));
             break;

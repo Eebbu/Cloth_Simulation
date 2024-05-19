@@ -6,7 +6,8 @@
 #include <vector>
 enum class RigidType {
     Ball,
-    Cube
+    Cube,
+    Empty
 };
 
 struct Vertex {

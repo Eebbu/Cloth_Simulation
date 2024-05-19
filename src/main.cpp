@@ -45,6 +45,8 @@ RigidType currentRigidType = RigidType::Cube;  // Default to ball
 //Boolean show ball or cube
 bool showBall = false;
 bool showCube = true;
+void *obj;
+
 // Window and world
 GLFWwindow *window;
 glm::dvec3 bgColor = glm::dvec3(0.0/255, 0.0/255, 0.0/255);
@@ -107,11 +109,22 @@ int main(int argc, const char * argv[]) {
         
         
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
+        if(currentRigidType == RigidType::Ball){
+            obj = static_cast<void*>(&ball);
+        }else if(currentRigidType == RigidType::Cube){
+            obj = static_cast<void*>(&cube);
+        }else{
+            obj = nullptr;
+        }
+        
+        
         for (int i = 0; i < 25; i ++) {
             if (method == "RK") {
-                cloth.rk4_step(currentRigidType,currentRigidType == RigidType::Ball ? static_cast<void*>(&ball) : static_cast<void*>(&cube),TIME_STEP);
+                // cloth.rk4_step(currentRigidType,currentRigidType == RigidType::Ball ? static_cast<void*>(&ball) : static_cast<void*>(&cube),TIME_STEP);
+                cloth.rk4_step(currentRigidType, obj, TIME_STEP);
             }else{
-                cloth.step(currentRigidType,currentRigidType == RigidType::Ball ? static_cast<void*>(&ball) : static_cast<void*>(&cube),TIME_STEP);
+                // cloth.step(currentRigidType,currentRigidType == RigidType::Ball ? static_cast<void*>(&ball) : static_cast<void*>(&cube),TIME_STEP);
+                cloth.step(currentRigidType, obj, TIME_STEP);
             }
         }
         cloth.adaptive_refinement();
@@ -199,6 +212,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         showCube = false;
         currentRigidType = RigidType::Ball;
         cout << "----------Show Ball-----------" << endl;
+    }
+        //show only cloth when press d
+    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+        showBall = false;
+        showCube = false;
+        currentRigidType = RigidType::Empty;
+        cout << "----------Show Cloth-----------" << endl;
     }
 
     //close windoow when press Esc
