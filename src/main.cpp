@@ -36,6 +36,8 @@ glm::dvec3 windStartPos;
 glm::dvec3 windDir;
 glm::dvec3 wind;
 Cloth cloth;
+//show constraint
+bool constraint = true;
 
 
 // Ball&Cube
@@ -54,9 +56,13 @@ glm::dvec3 bgColor = glm::dvec3(0.0/255, 0.0/255, 0.0/255);
 
 int main(int argc, const char * argv[]) {
     string method = "Euler";  //default method is Euler
-    if (argc > 1) {
-        method = argv[1];
+    if (argc > 1 ) {
+        string input_string = argv[1];
+        if(input_string == "RK"){
+            method = argv[1];
+        }
     }
+    cout << method << endl;
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -120,11 +126,9 @@ int main(int argc, const char * argv[]) {
         
         for (int i = 0; i < 25; i ++) {
             if (method == "RK") {
-                // cloth.rk4_step(currentRigidType,currentRigidType == RigidType::Ball ? static_cast<void*>(&ball) : static_cast<void*>(&cube),TIME_STEP);
-                cloth.rk4_step(currentRigidType, obj, TIME_STEP);
+                cloth.rk4_step(constraint, currentRigidType, obj, TIME_STEP);
             }else{
-                // cloth.step(currentRigidType,currentRigidType == RigidType::Ball ? static_cast<void*>(&ball) : static_cast<void*>(&cube),TIME_STEP);
-                cloth.step(currentRigidType, obj, TIME_STEP);
+                cloth.step(constraint, currentRigidType, obj, TIME_STEP);
             }
         }
         cloth.adaptive_refinement();
@@ -213,12 +217,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         currentRigidType = RigidType::Ball;
         cout << "----------Show Ball-----------" << endl;
     }
-        //show only cloth when press d
+    //show only cloth when press d
     if (key == GLFW_KEY_D && action == GLFW_PRESS) {
         showBall = false;
         showCube = false;
         currentRigidType = RigidType::Empty;
         cout << "----------Show Cloth-----------" << endl;
+    }
+    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+        constraint = (1 - constraint);
+        cout << "----------Add constraint-----------" << endl;
     }
 
     //close windoow when press Esc
