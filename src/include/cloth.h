@@ -309,6 +309,29 @@ public:
         collisionResponse(type, object);
     }
 
+    void explicit_verlet(bool constraint, RigidType type, void *object, double delta_t) 
+    {
+        compute_forces();
+
+        for (auto &mass : this->masses)
+        {
+            if (!mass->is_fixed)
+            {
+                glm::dvec3 a = mass->force / mass->m + gravity * 10.0;
+                auto temp = mass->position;
+                mass->position += (1.0 - damp_coef) * (mass->position - mass->last_position) + a * delta_t * delta_t;
+                mass->last_position = temp;
+            }
+            mass->force = glm::dvec3(0.0, 0.0, 0.0);
+        }
+        if(constraint){
+            solve_constraints(0);
+            update_velocity_after_constraints(delta_t);
+        }
+        collisionResponse(type, object);
+    }
+
+
     void solve_constraints(int iterations)
     {
         for (int i = 0; i < this->constraints_iterations; i++)
