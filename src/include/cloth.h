@@ -205,7 +205,7 @@ public:
         }
     }
 
-    void step(RigidType type, void *object, double delta_t)
+    void step(bool constraint, RigidType type, void *object, double delta_t)
     {
         compute_forces();
 
@@ -219,16 +219,17 @@ public:
             }
             mass->force = glm::dvec3(0.0, 0.0, 0.0);
         }
-
-        solve_constraints(0);
-        update_velocity_after_constraints(delta_t);
+        if(constraint){
+            solve_constraints(0);
+            update_velocity_after_constraints(delta_t);
+        }
         collisionResponse(type, object);
     }
 
     /**
      * Runge Kutta
      */
-    void rk4_step(RigidType type, void *object, double delta_t)
+    void rk4_step(bool constraint, RigidType type, void *object, double delta_t)
     {
         std::vector<glm::dvec3> initial_positions;
         std::vector<glm::dvec3> initial_velocities;
@@ -335,8 +336,10 @@ public:
             masses[i]->force = glm::dvec3(0.0); // Reset force for the next timestep
         }
 
-        solve_constraints(0);
-        update_velocity_after_constraints(delta_t);
+        if(constraint){
+            solve_constraints(0);
+            update_velocity_after_constraints(delta_t);
+        }
         collisionResponse(type, object);
     }
 
@@ -508,14 +511,14 @@ public:
     {
         switch (type)
         {
-        case RigidType::Empty:
-            break;
-        case RigidType::Ball:
-            collisionResponse(static_cast<Ball *>(object));
-            break;
-        case RigidType::Cube:
-            collisionResponse(static_cast<Cube *>(object));
-            break;
+            case RigidType::Empty:
+                break;
+            case RigidType::Ball:
+                collisionResponse(static_cast<Ball *>(object));
+                break;
+            case RigidType::Cube:
+                collisionResponse(static_cast<Cube *>(object));
+                break;
         }
     }
     void collisionResponse(Ball *ball)
