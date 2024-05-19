@@ -9,16 +9,16 @@
 class Cloth
 {
 public:
-    const int mass_per_row = 30;
-    const int mass_per_col = 30;
+    const int mass_per_row = 36;
+    const int mass_per_col = 36;
     const double mass_density = (double)mass_per_row / 14.0;
     const double structural_coef = 300.0;
-    const double shear_coef = 200.0;
-    const double flexion_coef = 200.0;
+    const double shear_coef = 50.0;
+    const double flexion_coef = 100.0;
     const double damp_coef = 0.65;
     const glm::dvec3 gravity = glm::dvec3(0.0, -1.0, 0.0);
     const glm::vec3 cloth_pos = glm::vec3(-7.0, 18.0, -6.0);
-    bool draw_texture = false;
+    bool draw_texture = true;
     const double refine_angle = std::cos(glm::radians(135.0f));
     const int constraints_iterations = 6;
     const int refine_iterations = 3;
@@ -35,8 +35,8 @@ public:
         link_springs();
         initialize_face();
 
-        fixed_mass(get_mass(0, 0), glm::dvec3(0.1, 0.0, 0.0));
-        fixed_mass(get_mass(mass_per_row - 1, 0), glm::dvec3(-0.1, 0.0, 0.0));
+        fixed_mass(get_mass(0, 0), glm::dvec3(0.8, 0.0, 0.0));
+        fixed_mass(get_mass(mass_per_row - 1, 0), glm::dvec3(-0.8, 0.0, 0.0));
     }
 
     ~Cloth()
