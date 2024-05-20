@@ -1,9 +1,12 @@
 # Cloth Simulation
 <div class="center">
-  <img src="pictures/cloth.png" alt="Texture" width="50%"/><img src="pictures/spring.png" alt="Spring" width="50%"/>
+  <img src="pictures/cloth.png" alt="Texture" width="50%"/><img src="pictures/spring.png" alt="Spring_without_constraint" width="50%"/>
 </div>
 <div class="center">
-	<img src="pictures/cloth_cube.png" alt="Cube collision" width="50%"/><img src="pictures/cloth_ball.png" alt="Ball collision" width="50%"/>
+	<img src="pictures/cloth_constrait.png" alt="Spring_with_constraint" width="50%"/><img src="pictures/cloth_ball.png" alt="Ball collision" width="50%"/>
+</div>
+<div class="center">
+	<img src="pictures/cloth_rectangle.png" alt="Rectangle collision" width="50%"/><img src="pictures/cloth_cube.png" alt="Cube collision" width="50%"/>
 </div>
 
 ### UI
@@ -13,10 +16,10 @@
   - `R` Restart
 - ##### Draw Mode: Change the rendering mode of cloth
   - `T` Switch between Cloth Mode and Texture Mode
-- ##### Change the object
+- ##### Switch the object(double click to hide)
   - `C` Cube
   - `B` Ball
-  - `D` Remove object
+  - `E` Rectangle
   
 - ##### Wind Force
 
@@ -51,6 +54,7 @@
   - `class Sphere`
   - `struct Ball`
   - `class Cube`
+  - `class Rectangle`
 - ##### program.h -> Shader program built itself from .glsl files
   - `class Program`
 - ##### render.h -> Global camera, light & Renderers for cloth and rigid bodies
@@ -62,4 +66,5 @@
   - `struct RigidRender`
   - `struct BallRender`
   - `struct CubeRender`
+  - `struct RectangleRender`
   

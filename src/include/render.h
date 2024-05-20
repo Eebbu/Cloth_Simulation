@@ -520,3 +520,14 @@ struct CubeRender {
     
     void flush() { render.flush(); }
 };
+struct RectangleRender {
+    Rectangle* rectangle;
+    RigidRender render;
+    
+    RectangleRender(Rectangle* rectangle) {
+        rectangle = rectangle;
+        render.init(rectangle->faces, rectangle->color, glm::vec3(0, 0, 0));
+    }
+    
+    void flush() { render.flush(); }
+};
