@@ -466,27 +466,27 @@ public:
     {
         for (auto &mass : masses)
         {
-            glm::vec3 distVec = getWorldPos(mass) - ball->center;
-            float dist = glm::length(distVec);
+            glm::vec3 dist_vec = getWorldPos(mass) - ball->center;
+            float dist = glm::length(dist_vec);
             float penetration = ball->radius - dist;
 
             if (dist < ball->radius)
             {
-                glm::vec3 normal = glm::normalize(distVec);
+                glm::vec3 normal = glm::normalize(dist_vec);
                 int r = ball->radius;
-                glm::vec3 contactPoint = ball->center + normal * (float)r;
-                // glm::vec3 contactPoint = ball->center + normal *(float)1.2*(float)r;
+                glm::vec3 contact_point = ball->center + normal * (float)r;
+                // glm::vec3 contact_point = ball->center + normal *(float)1.2*(float)r;
                 // Reposition the mass
-                setWorldPos(mass, contactPoint);
+                setWorldPos(mass, contact_point);
 
                 // Reflect velocity
-                glm::vec3 incomingVelocity = mass->velocity;
-                float velocityAlongNormal = glm::dot(incomingVelocity, normal);
+                glm::vec3 incoming_v = mass->velocity;
+                float normal_v = glm::dot(incoming_v, normal);
 
-                if (velocityAlongNormal < 0)
+                if (normal_v < 0)
                 {
-                    glm::vec3 reflectedVelocity = incomingVelocity - 2 * velocityAlongNormal * normal;
-                    mass->velocity = reflectedVelocity * (float)ball->friction;
+                    glm::vec3 reflect_v = incoming_v - 2 * normal_v * normal;
+                    mass->velocity = reflect_v * (float)ball->friction;
                 }
             }
         }
@@ -533,22 +533,15 @@ public:
 
                 //reflect the velocity
                 glm::vec3 normal = glm::normalize(newWorldPos - worldPos);
-                glm::vec3 incomingVelocity = mass->velocity;
-                float velocityAlongNormal = glm::dot(incomingVelocity, normal);
+                glm::vec3 incoming_v = mass->velocity;
+                float normal_v = glm::dot(incoming_v, normal);
 
-                if (velocityAlongNormal < 0)
+                if (normal_v < 0)
                 {
-                    glm::vec3 reflectedVelocity = incomingVelocity - 2 * velocityAlongNormal * normal;
-                    mass->velocity = reflectedVelocity * cube->friction;
+                    glm::vec3 reflect_v = incoming_v - 2 * normal_v * normal;
+                    mass->velocity = reflect_v * cube->friction;
                 }
             }
         }
     }
-
-    // std::cout << "Cube Collision Detected: \n";
-    // std::cout << "  WorldPos: " << glm::to_string(worldPos) << "\n";
-    // std::cout << "  NearestSurface: " << glm::to_string(nearestSurface) << "\n";
-    // std::cout << "  DistToSurface: " << glm::to_string(distToSurface) << "\n";
-    // std::cout << "  CollisionNormal: " << glm::to_string(collisionNormal) << "\n";
-    // std::cout << "  NewWorldPos: " << glm::to_string(newWorldPos) << "\n";
 };
