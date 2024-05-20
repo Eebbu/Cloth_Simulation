@@ -2,7 +2,10 @@
 #define MASS_H
 
 #include <glm/glm.hpp>
+#include <map>
 #include <vector>
+
+class Spring;
 
 class Mass {
 public:
@@ -15,6 +18,7 @@ public:
     glm::dvec3      velocity     = glm::dvec3(0, 0, 0);
     glm::dvec3	    acceleration = glm::dvec3(0, 0, 0);
     glm::dvec3      force        = glm::dvec3(0, 0, 0);
+
 
 public:
     Mass(void) {}

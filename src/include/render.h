@@ -117,7 +117,7 @@ struct ClothRender {
         /** Load image and configure texture **/
         stbi_set_flip_vertically_on_load(true);
         int texW, texH, colorChannels; // After loading the image, stb_image will fill them
-        unsigned char *data = stbi_load("../textures/texture.jpg", &texW, &texH, &colorChannels, 0);
+        unsigned char *data = stbi_load("../textures/texture.jpeg", &texW, &texH, &colorChannels, 0);
         if (data) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texW, texH, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             // Automatically generate all the required mipmaps for the currently bound texture.
@@ -505,6 +505,17 @@ struct BallRender {
     BallRender(Ball* b) {
         ball = b;
         render.init(ball->sphere->faces, ball->color, ball->center);
+    }
+    
+    void flush() { render.flush(); }
+};
+struct CubeRender {
+    Cube* cube;
+    RigidRender render;
+    
+    CubeRender(Cube* c) {
+        cube = c;
+        render.init(cube->faces, cube->color, glm::vec3(0, 0, 0));
     }
     
     void flush() { render.flush(); }

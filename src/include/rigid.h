@@ -4,6 +4,11 @@
 
 #include <cmath>
 #include <vector>
+enum class RigidType {
+    Ball,
+    Cube,
+    Empty
+};
 
 struct Vertex {
 public:
@@ -11,12 +16,17 @@ public:
     glm::dvec3 normal;
     
     Vertex() {}
+    Vertex(glm::dvec3 pos, glm::dvec3 norm)
+        :position(pos),normal(norm)
+    {
+
+    }
+
     Vertex(glm::dvec3 pos) {
         position = pos;
     }
     ~Vertex() {}
 };
-
 class Sphere {
 public:
     const int meridianNum = 24;
@@ -65,7 +75,7 @@ public:
             vertexes[i]->normal = normal;
         }
         
-        // The normal of all faces of the first and last cycle should be calculated specially!
+        // The normal of all faces of the first and last cycle should be calculated specially
         for (int i = 0; i < faces.size()/3; i ++) {
             Vertex* v1 = faces[i*3+0];
             Vertex* v2 = faces[i*3+1];
@@ -136,11 +146,11 @@ public:
     }
 };
 
-struct Ball {
+struct Ball{
     const int        radius   = 1;
     const double     friction = 0.8;
-    const glm::vec3  center   = glm::vec3(0, 6, 0);
-    const glm::vec4  color    = glm::vec4(0.6f, 0.5f, 0.8f, 1.0f);
+    const glm::vec3  center   = glm::vec3(0, 8, 0);
+    const glm::vec4  color    = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     
     
     Sphere* sphere;
@@ -149,4 +159,69 @@ struct Ball {
         sphere = new Sphere(radius, center);
     }
     ~Ball() {}
+};
+
+class Cube {
+public:
+    std::vector<Vertex*> vertices;
+    std::vector<Vertex*> faces;
+    double           size     = 2;
+    glm::vec3        center   = glm::vec3(0, 8, 0);
+    const glm::vec4  color    = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    const float    friction = 0.8;
+
+
+    Cube(glm::dvec3 center, double size) 
+        : center(center), size(size) {
+        init(center, size);
+    }
+    Cube()
+    {
+        init(center,size);
+    }
+    ~Cube() {
+        for (Vertex* vertex : vertices) {
+            delete vertex;
+        }
+        vertices.clear();
+        faces.clear();
+    }
+
+    void init(glm::dvec3 center, double size) {
+        // Half size for vertex offset calculation
+        double halfSize = size / 2.0;
+
+        // Vertex positions relative to the centerS
+        std::vector<glm::dvec3> positions = {
+            glm::dvec3(-halfSize, -halfSize, halfSize),
+            glm::dvec3(halfSize, -halfSize, halfSize),
+            glm::dvec3(halfSize, halfSize, halfSize),
+            glm::dvec3(-halfSize, halfSize, halfSize),
+            glm::dvec3(-halfSize, -halfSize, -halfSize),
+            glm::dvec3(halfSize, -halfSize, -halfSize),
+            glm::dvec3(halfSize, halfSize, -halfSize),
+            glm::dvec3(-halfSize, halfSize, -halfSize)
+        };
+
+        // Creating vertices
+        glm::dvec3 normal(0.0, 0.0, 1.0); //initial normal
+        for (const auto& pos : positions) {
+            vertices.push_back(new Vertex(center + pos, normal));
+        }
+
+        // Define faces based on vertex indices
+        std::vector<std::vector<int>> faceIndices = {
+            {0, 1, 2, 3}, {4, 5, 6, 7}, {0, 4, 7, 3},
+            {1, 5, 6, 2}, {0, 1, 5, 4}, {3, 2, 6, 7}
+        };
+
+        for (const auto& indices : faceIndices) {
+            faces.push_back(vertices[indices[0]]);
+            faces.push_back(vertices[indices[1]]);
+            faces.push_back(vertices[indices[2]]);
+            faces.push_back(vertices[indices[0]]);
+            faces.push_back(vertices[indices[2]]);
+            faces.push_back(vertices[indices[3]]);
+        }
+    }
 };
