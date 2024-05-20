@@ -87,7 +87,7 @@ public:
         {
             for (int j = 0; j < mass_per_col; j++)
             {
-                Mass* mass = get_mass(i, j);
+                Mass *mass = get_mass(i, j);
                 // structural springs
                 if (i < mass_per_row - 1)
                 {
@@ -185,7 +185,8 @@ public:
             }
             mass->force = glm::dvec3(0.0, 0.0, 0.0);
         }
-        if(constraint){
+        if (constraint)
+        {
             solve_constraints(0);
             update_velocity_after_constraints(delta_t);
         }
@@ -302,14 +303,15 @@ public:
             masses[i]->force = glm::dvec3(0.0); // Reset force for the next timestep
         }
 
-        if(constraint){
+        if (constraint)
+        {
             solve_constraints(0);
             update_velocity_after_constraints(delta_t);
         }
         collisionResponse(type, object);
     }
 
-    void explicit_verlet(bool constraint, RigidType type, void *object, double delta_t) 
+    void explicit_verlet(bool constraint, RigidType type, void *object, double delta_t)
     {
         compute_forces();
 
@@ -324,13 +326,13 @@ public:
             }
             mass->force = glm::dvec3(0.0, 0.0, 0.0);
         }
-        if(constraint){
+        if (constraint)
+        {
             solve_constraints(0);
             update_velocity_after_constraints(delta_t);
         }
         collisionResponse(type, object);
     }
-
 
     void solve_constraints(int iterations)
     {
@@ -452,14 +454,16 @@ public:
     {
         switch (type)
         {
-            case RigidType::Empty:
-                break;
-            case RigidType::Ball:
-                collisionResponse(static_cast<Ball *>(object));
-                break;
-            case RigidType::Cube:
-                collisionResponse(static_cast<Cube *>(object));
-                break;
+        case RigidType::Empty:
+            break;
+        case RigidType::Ball:
+            collisionResponse(static_cast<Ball *>(object));
+            break;
+        case RigidType::Cube:
+            collisionResponse(static_cast<Cube *>(object));
+            break;
+        case RigidType::Rectangle:
+            collisionResponse(static_cast<Rectangle *>(object));
         }
     }
     void collisionResponse(Ball *ball)
@@ -482,7 +486,7 @@ public:
 
                 // Reflect velocity
                 glm::vec3 incoming_v = mass->velocity;
-                float normal_v = glm::dot(incoming_v, normal);
+                float normal_v = glm::dot(incoming_v, normal) + 0.01f;
 
                 if (normal_v < 0)
                 {
@@ -492,7 +496,7 @@ public:
             }
         }
     }
-    void collisionResponse(Cube *cube)//AABB
+    void collisionResponse(Cube *cube) // AABB
     {
         // Iterate through each mass in the cloth
         for (auto &mass : masses)
@@ -500,22 +504,22 @@ public:
             glm::vec3 worldPos = getWorldPos(mass);
             glm::vec3 dist = worldPos - cube->center;
 
-            //half size of the cube
+            // half size of the cube
             double halfSize = cube->size / 2.0;
 
-            //Check if the mass is inside the cube
+            // Check if the mass is inside the cube
             bool insideX = abs(dist.x) < halfSize;
             bool insideY = abs(dist.y) < halfSize;
             bool insideZ = abs(dist.z) < halfSize;
 
             if (insideX && insideY && insideZ)
             {
-                //calculate penetration
+                // calculate penetration
                 double penetrationX = halfSize - abs(dist.x);
                 double penetrationY = halfSize - abs(dist.y);
                 double penetrationZ = halfSize - abs(dist.z);
 
-                //find nearest face
+                // find nearest face
                 if (penetrationX < penetrationY && penetrationX < penetrationZ)
                 {
                     dist.x = (dist.x > 0) ? halfSize : -halfSize;
@@ -528,11 +532,11 @@ public:
                 {
                     dist.z = (dist.z > 0) ? halfSize : -halfSize;
                 }
-                //re-position the mass
+                // re-position the mass
                 glm::vec3 newWorldPos = cube->center + dist;
                 setWorldPos(mass, newWorldPos);
 
-                //reflect the velocityS
+                // reflect the velocity
                 glm::vec3 normal = glm::normalize(newWorldPos - worldPos);
                 glm::vec3 incoming_v = mass->velocity;
                 float normal_v = glm::dot(incoming_v, normal);
@@ -541,6 +545,62 @@ public:
                 {
                     glm::vec3 reflect_v = incoming_v - 2 * normal_v * normal;
                     mass->velocity = reflect_v * cube->friction;
+                }
+            }
+        }
+    }
+    void collisionResponse(Rectangle *rectangle) // AABB
+    {
+        // Iterate through each mass in the cloth
+        for (auto &mass : masses)
+        {
+            glm::vec3 worldPos = getWorldPos(mass);
+            glm::vec3 dist = worldPos - rectangle->center;
+
+            // Half sizes of the rectangle
+            double halfWidth = rectangle->width / 2.0;
+            double halfHeight = rectangle->height / 2.0;
+            double halfDepth = rectangle->depth / 2.0;
+
+            // Check if the mass is inside the rectangle
+            bool insideX = abs(dist.x) < halfWidth;
+            bool insideY = abs(dist.y) < halfHeight;
+            bool insideZ = abs(dist.z) < halfDepth;
+
+            if (insideX && insideY && insideZ)
+            {
+                // Calculate penetration
+                double penetrationX = halfWidth - abs(dist.x);
+                double penetrationY = halfHeight - abs(dist.y);
+                double penetrationZ = halfDepth - abs(dist.z);
+
+                // Find nearest face
+                if (penetrationX < penetrationY && penetrationX < penetrationZ)
+                {
+                    dist.x = (dist.x > 0) ? halfWidth : -halfWidth;
+                }
+                else if (penetrationY < penetrationX && penetrationY < penetrationZ)
+                {
+                    dist.y = (dist.y > 0) ? halfHeight : -halfHeight;
+                }
+                else
+                {
+                    dist.z = (dist.z > 0) ? halfDepth : -halfDepth;
+                }
+
+                // Re-position the mass
+                glm::vec3 newWorldPos = rectangle->center + dist;
+                setWorldPos(mass, newWorldPos);
+
+                // Reflect the velocity
+                glm::vec3 normal = glm::normalize(newWorldPos - worldPos);
+                glm::vec3 incoming_v = mass->velocity;
+                float normal_v = glm::dot(incoming_v, normal);
+
+                if (normal_v < 0)
+                {
+                    glm::vec3 reflect_v = incoming_v - 2 * normal_v * normal;
+                    mass->velocity = reflect_v * rectangle->friction;
                 }
             }
         }

@@ -7,6 +7,7 @@
 enum class RigidType {
     Ball,
     Cube,
+    Rectangle,
     Empty
 };
 
@@ -166,15 +167,10 @@ public:
     std::vector<Vertex*> vertices;
     std::vector<Vertex*> faces;
     double           size     = 2;
-    glm::vec3        center   = glm::vec3(0, 8, 0);
+    const glm::vec3  center   = glm::vec3(0, 8, 0);
     const glm::vec4  color    = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     const float    friction = 0.8;
 
-
-    Cube(glm::dvec3 center, double size) 
-        : center(center), size(size) {
-        init(center, size);
-    }
     Cube()
     {
         init(center,size);
@@ -205,6 +201,70 @@ public:
 
         // Creating vertices
         glm::dvec3 normal(0.0, 0.0, 1.0); //initial normal
+        for (const auto& pos : positions) {
+            vertices.push_back(new Vertex(center + pos, normal));
+        }
+
+        // Define faces based on vertex indices
+        std::vector<std::vector<int>> faceIndices = {
+            {0, 1, 2, 3}, {4, 5, 6, 7}, {0, 4, 7, 3},
+            {1, 5, 6, 2}, {0, 1, 5, 4}, {3, 2, 6, 7}
+        };
+
+        for (const auto& indices : faceIndices) {
+            faces.push_back(vertices[indices[0]]);
+            faces.push_back(vertices[indices[1]]);
+            faces.push_back(vertices[indices[2]]);
+            faces.push_back(vertices[indices[0]]);
+            faces.push_back(vertices[indices[2]]);
+            faces.push_back(vertices[indices[3]]);
+        }
+    }
+};
+
+class Rectangle {
+public:
+    std::vector<Vertex*> vertices;
+    std::vector<Vertex*> faces;
+    const glm::vec4  color    = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    const glm::vec3  center   = glm::vec3(0, 3, 0);
+    const double      width   = 4.0;         
+    const double     height   = 2.0;
+    const double      depth   = 3.0;
+    const float    friction   = 0.8;
+    Rectangle()
+    {
+        init(center, width, height, depth);
+    }
+
+    ~Rectangle() {
+        for (Vertex* vertex : vertices) {
+            delete vertex;
+        }
+        vertices.clear();
+        faces.clear();
+    }
+
+    void init(glm::dvec3 center, double width, double height, double depth) {
+        // Half sizes for vertex offset calculation
+        double halfWidth = width / 2.0;
+        double halfHeight = height / 2.0;
+        double halfDepth = depth / 2.0;
+
+        // Vertex positions relative to the center
+        std::vector<glm::dvec3> positions = {
+            glm::dvec3(-halfWidth, -halfHeight, halfDepth),
+            glm::dvec3(halfWidth, -halfHeight, halfDepth),
+            glm::dvec3(halfWidth, halfHeight, halfDepth),
+            glm::dvec3(-halfWidth, halfHeight, halfDepth),
+            glm::dvec3(-halfWidth, -halfHeight, -halfDepth),
+            glm::dvec3(halfWidth, -halfHeight, -halfDepth),
+            glm::dvec3(halfWidth, halfHeight, -halfDepth),
+            glm::dvec3(-halfWidth, halfHeight, -halfDepth)
+        };
+
+        // Creating vertices
+        glm::dvec3 normal(0.0, 0.0, 1.0); // initial normal
         for (const auto& pos : positions) {
             vertices.push_back(new Vertex(center + pos, normal));
         }
