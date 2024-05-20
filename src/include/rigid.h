@@ -191,7 +191,7 @@ public:
         // Half size for vertex offset calculation
         double halfSize = size / 2.0;
 
-        // Vertex positions relative to the center
+        // Vertex positions relative to the centerS
         std::vector<glm::dvec3> positions = {
             glm::dvec3(-halfSize, -halfSize, halfSize),
             glm::dvec3(halfSize, -halfSize, halfSize),
@@ -204,7 +204,7 @@ public:
         };
 
         // Creating vertices
-        glm::dvec3 normal(0.0, 0.0, 1.0); // Placeholder for actual normal calculation
+        glm::dvec3 normal(0.0, 0.0, 1.0); //initial normal
         for (const auto& pos : positions) {
             vertices.push_back(new Vertex(center + pos, normal));
         }
