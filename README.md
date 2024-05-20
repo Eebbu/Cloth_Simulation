@@ -40,7 +40,7 @@
 ### Data Structures
 
 - ##### mass..h
-  -`class Mass`
+  - `class Mass`
 
 - ##### spring.h
   - `class Spring`

@@ -18,7 +18,7 @@ public:
     const double damp_coef = 0.65;
     const glm::dvec3 gravity = glm::dvec3(0.0, -1.0, 0.0);
     const glm::vec3 cloth_pos = glm::vec3(-7.0, 18.0, -6.0);
-    bool draw_texture = true;
+    bool draw_texture = false;
     const double refine_angle = std::cos(glm::radians(135.0f));
     const int constraints_iterations = 6;
     const int refine_iterations = 3;
@@ -464,6 +464,7 @@ public:
     }
     void collisionResponse(Ball *ball)
     {
+        // Iterate through each mass in the cloth
         for (auto &mass : masses)
         {
             glm::vec3 dist_vec = getWorldPos(mass) - ball->center;
@@ -527,11 +528,11 @@ public:
                 {
                     dist.z = (dist.z > 0) ? halfSize : -halfSize;
                 }
-                //reposition the mass
+                //re-position the mass
                 glm::vec3 newWorldPos = cube->center + dist;
                 setWorldPos(mass, newWorldPos);
 
-                //reflect the velocity
+                //reflect the velocityS
                 glm::vec3 normal = glm::normalize(newWorldPos - worldPos);
                 glm::vec3 incoming_v = mass->velocity;
                 float normal_v = glm::dot(incoming_v, normal);

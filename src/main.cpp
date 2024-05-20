@@ -43,10 +43,10 @@ bool constraint = true;
 // Ball&Cube
 Ball ball;
 Cube cube;
-RigidType currentRigidType = RigidType::Cube;  // Default to ball
+RigidType currentRigidType = RigidType::Empty;  // Default to Emptu
 //Boolean show ball or cube
 bool showBall = false;
-bool showCube = true;
+bool showCube = false;
 void *obj;
 
 // Window and world
@@ -188,11 +188,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_R && action == GLFW_PRESS) {
 
         cloth.reset();
-        //TODO : reset other..
         cout << "----------Simulation reset-----------" << endl;
     }
 
-    //texture
+    //add texture when press TS
     if (key == GLFW_KEY_T && action == GLFW_PRESS) {
         cloth.draw_texture = (1 - cloth.draw_texture);
     }
@@ -212,13 +211,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         currentRigidType = RigidType::Ball;
         cout << "----------Show Ball-----------" << endl;
     }
-    //show only cloth when press d
+    //show only cloth when press D
     if (key == GLFW_KEY_D && action == GLFW_PRESS) {
         showBall = false;
         showCube = false;
         currentRigidType = RigidType::Empty;
         cout << "----------Show Cloth-----------" << endl;
     }
+    //add constraint when press A
     if (key == GLFW_KEY_A && action == GLFW_PRESS) {
         constraint = (1 - constraint);
         cout << "----------Add constraint-----------" << endl;
