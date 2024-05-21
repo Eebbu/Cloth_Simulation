@@ -26,7 +26,7 @@ public:
         : mass1(m1), mass2(m2), spring_constant(k), spring_type(_spring_type) {
 
         rest_len = glm::length(mass2->position - mass1->position);
-        max_len = rest_len * 1.5;
+        max_len = rest_len * 1.1;
 	}
 
     double get_length() {
