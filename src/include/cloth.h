@@ -139,9 +139,21 @@ public:
 
     void compute_forces()
     {
+        //If the force is nan, convert it to a number.
         for (auto &mass : this->masses)
         {
-            mass->force = glm::dvec3(0.0);
+            if (std::isnan(mass->force.x))
+            {
+                mass->force.x = 0.0;
+            }
+            if (std::isnan(mass->force.y))
+            {
+                mass->force.y = 0.0;
+            }
+            if (std::isnan(mass->force.z))
+            {
+                mass->force.z = 0.0;
+            }
         }
 
         for (auto &spring : this->springs)
