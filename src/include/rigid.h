@@ -227,7 +227,7 @@ public:
     std::vector<Vertex*> vertices;
     std::vector<Vertex*> faces;
     const glm::vec4  color    = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    const glm::vec3  center   = glm::vec3(0, 3, 0);
+    const glm::vec3  center   = glm::vec3(0, 4.5, 0);
     const double      width   = 4.0;         
     const double     height   = 2.0;
     const double      depth   = 3.0;

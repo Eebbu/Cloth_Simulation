@@ -5,18 +5,17 @@
 #include "spring.h"
 #include "rigid.h"
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp> // 包含 string_cast 头文件
 class Cloth
 {
 public:
-    const int mass_per_row = 36;
-    const int mass_per_col = 36;
+    const int mass_per_row = 32;
+    const int mass_per_col = 32;
     const double mass_density = (double)mass_per_row / 14.0;
     const double structural_coef = 300.0;
     const double shear_coef = 50.0;
     const double flexion_coef = 100.0;
     const double damp_coef = 0.65;
-    const glm::dvec3 gravity = glm::dvec3(0.0, -1.0, 0.0);
+    const glm::dvec3 gravity = glm::dvec3(0.0, -2.0, 0.0);
     const glm::vec3 cloth_pos = glm::vec3(-7.0, 18.0, -6.0);
     bool draw_texture = false;
     const double refine_angle = std::cos(glm::radians(135.0f));
@@ -187,7 +186,7 @@ public:
         }
         if (constraint)
         {
-            solve_constraints(0);
+            solve_constraints(constraints_iterations);
             update_velocity_after_constraints(delta_t);
         }
         collisionResponse(type, object);
@@ -305,7 +304,7 @@ public:
 
         if (constraint)
         {
-            solve_constraints(0);
+            solve_constraints(constraints_iterations);
             update_velocity_after_constraints(delta_t);
         }
         collisionResponse(type, object);
@@ -346,6 +345,11 @@ public:
                 {
                     continue;
                 }
+                // skip the flexion springs and shear springs
+                // if (spring->spring_type == Spring::FLEXION || spring->spring_type == Spring::SHEAR)
+                // {
+                //     continue;
+                // }
                 double current_length = spring->get_length();
                 if (current_length <= spring->max_len)
                 {
@@ -433,8 +437,8 @@ public:
         initialize_face();
 
         // pin mass
-        fixed_mass(get_mass(0, 0), glm::dvec3(1.0, 0.0, 0.0));
-        fixed_mass(get_mass(mass_per_row - 1, 0), glm::dvec3(-1.0, 0.0, 0.0));
+        fixed_mass(get_mass(0, 0), glm::dvec3(0.8, 0.0, 0.0));
+        fixed_mass(get_mass(mass_per_row - 1, 0), glm::dvec3(-0.8, 0.0, 0.0));
 
         // recompute normal
         compute_normal();
