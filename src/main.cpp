@@ -41,13 +41,15 @@ Cloth cloth;
 bool constraint = true;
 
 
-// Ball&Cube
+// Ball&Cube&rectangle
 Ball ball;
 Cube cube;
+Rectangle rectangle;
 RigidType currentRigidType = RigidType::Empty;  // Default to Emptu
 //Boolean show ball or cube
 bool showBall = false;
 bool showCube = false;
+bool showRect = false;
 void *obj;
 
 // Window and world
@@ -96,6 +98,7 @@ int main(int argc, const char * argv[]) {
     ClothSpringRender clothSpringRender(&cloth);
     BallRender ballRender(&ball);
     CubeRender cubeRender(&cube);
+    RectangleRender rectRender(&rectangle);
     // Vec3 initForce(10.0, 40.0, 20.0);
     // cloth.addForce(initForce);
     
@@ -114,6 +117,8 @@ int main(int argc, const char * argv[]) {
             obj = static_cast<void*>(&ball);
         }else if(currentRigidType == RigidType::Cube){
             obj = static_cast<void*>(&cube);
+        }else if(currentRigidType == RigidType::Rectangle){
+            obj = static_cast<void*>(&rectangle);
         }else{
             obj = nullptr;
         }
@@ -143,6 +148,10 @@ int main(int argc, const char * argv[]) {
         
         if (showBall) {
             ballRender.flush();
+        }
+        
+        if(showRect){
+            rectRender.flush();
         }
         
         /** -------------------------------- Simulation & Rendering -------------------------------- **/
@@ -238,26 +247,45 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     //show cube when press C
     if (key == GLFW_KEY_C && action == GLFW_PRESS) {
-        showCube = true;
+        showCube = (1 - showCube);
         showBall = false;
-        currentRigidType = RigidType::Cube;
-        cout << "----------Show Cube-----------" << endl;
+        showRect = false;
+        if(currentRigidType == RigidType::Cube){
+            currentRigidType = RigidType::Empty;
+            cout << "----------Hide Cube-----------" << endl;
+        }else{
+            currentRigidType = RigidType::Cube;
+            cout << "----------Show Cube-----------" << endl;
+        }
+    }
+    //show rectangle when press E
+    if (key == GLFW_KEY_E && action == GLFW_PRESS) {
+        showCube = false;
+        showBall = false;
+        showRect = (1 - showRect);
+        if(currentRigidType == RigidType::Rectangle){
+            currentRigidType = RigidType::Empty;
+            cout << "----------Hide Rectangle-----------" << endl;
+        }else{
+            currentRigidType = RigidType::Rectangle;
+            cout << "----------Show Rectangle-----------" << endl;
+        }
     }
 
     //show ball when press B
     if (key == GLFW_KEY_B && action == GLFW_PRESS) {
-        showBall = true;
+        showBall = (1 - showBall);
         showCube = false;
-        currentRigidType = RigidType::Ball;
-        cout << "----------Show Ball-----------" << endl;
+        showRect = false;
+        if(currentRigidType == RigidType::Ball){
+            currentRigidType = RigidType::Empty;
+            cout << "----------Hide Ball-----------" << endl;
+        }else{
+            currentRigidType = RigidType::Ball;
+            cout << "----------Show Ball-----------" << endl;
+        }
     }
-    //show only cloth when press D
-    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-        showBall = false;
-        showCube = false;
-        currentRigidType = RigidType::Empty;
-        cout << "----------Show Cloth-----------" << endl;
-    }
+
     //add constraint when press A
     if (key == GLFW_KEY_A && action == GLFW_PRESS) {
         constraint = (1 - constraint);
