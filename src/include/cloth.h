@@ -330,9 +330,9 @@ public:
         {
             if (!mass->is_fixed)
             {
-                glm::dvec3 a = mass->force / mass->m + gravity * 10.0;
+                glm::dvec3 a = mass->force / mass->m + gravity;
                 auto temp = mass->position;
-                mass->position += (1.0 - damp_coef) * (mass->position - mass->last_position) + a * delta_t * delta_t;
+                mass->position += (1.0 - damp_coef) * (mass->position - mass->last_position) + a * delta_t * delta_t * 10.0;
                 mass->last_position = temp;
             }
             mass->force = glm::dvec3(0.0, 0.0, 0.0);
