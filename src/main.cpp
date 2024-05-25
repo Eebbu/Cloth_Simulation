@@ -106,8 +106,9 @@ int main(int argc, const char *argv[])
     glPointSize(3);
 
     /** Redering loop **/
-    while (!glfwWindowShouldClose(window))
-    {
+    int count = 0;
+    auto start = std::chrono::high_resolution_clock::now();
+    while (!glfwWindowShouldClose(window)) {
         /** Set background clolor **/
         glClearColor(bgColor.x, bgColor.y, bgColor.z, 1.0); // Set color value (R,G,B,A) - Set Status
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -144,6 +145,12 @@ int main(int argc, const char *argv[])
             {
                 cloth.step(constraint, currentRigidType, obj, TIME_STEP);
             }
+        }
+        count++;
+        if (count == 100) {
+            auto end = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+            std::cout << duration.count() << std::endl;
         }
         cloth.compute_normal();
 
