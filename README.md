@@ -30,6 +30,7 @@
     cmake ..
     make
  Use the command` ./research RK`to display the Runge-Kutta method.
+ Use the command` ./research VERLET`to display the Verlet-Integration method.
  The default command `./research`will display the Euler method.
 
 ### Environment
