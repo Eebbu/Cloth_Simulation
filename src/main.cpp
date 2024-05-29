@@ -31,7 +31,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 /** Global **/
 // Wind
 int windBlowing = 0;
-double windForceScale = 15.0;
+double windForceScale = 400.0;
 glm::dvec3 windStartPos;
 glm::dvec3 windDir;
 glm::dvec3 wind;
